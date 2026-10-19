@@ -1,0 +1,8 @@
+# OS / 편집기
+.DS_Store
+Thumbs.db
+*.log
+
+# Node (현재 미사용이지만 혹시 대비)
+node_modules/
+.vercel/

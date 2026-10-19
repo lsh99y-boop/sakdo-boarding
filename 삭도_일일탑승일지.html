@@ -1,0 +1,954 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>계룡산 삭도 일일탑승일지</title>
+<style>
+  /* 레이아웃: 상단 고정 헤더 + 탭(작성·기록·QR) 세로 스크롤, 모바일 1열 폼 */
+  :root{
+    --bg:#eef2ee; --surface:#ffffff; --surface-2:#f6f9f6;
+    --fg:#17201b; --muted:#5c6b61; --line:#d7e0d8;
+    --accent:#1f6b47; --accent-ink:#ffffff; --accent-soft:#e3f0e8;
+    --up:#1f6b47; --down:#2b5a8c; --warn:#b4552d; --ok:#1f8a53;
+    --radius:14px; --shadow:0 1px 2px rgba(20,40,28,.06),0 6px 20px rgba(20,40,28,.05);
+    --fs-body:15px;
+    --font:"IBM Plex Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    --bg:#10150f; --surface:#19201a; --surface-2:#141a14;
+    --fg:#e8efe9; --muted:#9aa89f; --line:#2b352e;
+    --accent:#52b17f; --accent-ink:#06130c; --accent-soft:#1b2b22;
+    --up:#52b17f; --down:#6aa6dd; --warn:#d98052; --ok:#52b17f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }}
+  :root[data-theme="dark"]{
+    --bg:#10150f; --surface:#19201a; --surface-2:#141a14;
+    --fg:#e8efe9; --muted:#9aa89f; --line:#2b352e;
+    --accent:#52b17f; --accent-ink:#06130c; --accent-soft:#1b2b22;
+    --up:#52b17f; --down:#6aa6dd; --warn:#d98052; --ok:#52b17f;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:var(--fs-body);line-height:1.5;-webkit-text-size-adjust:100%}
+  h1,h2,h3{margin:0;text-wrap:balance}
+  button,input,select,textarea{font-family:inherit;font-size:16px;color:inherit}
+  .wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+  header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--accent);color:var(--accent-ink);box-shadow:var(--shadow)}
+  header.top .wrap{padding-block:12px;position:relative}
+  .back{position:absolute;right:max(16px,env(safe-area-inset-right,0px));top:12px;background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;cursor:pointer}
+  .back:active{background:rgba(255,255,255,.3)}
+  header.top .site{font-size:12px;letter-spacing:.06em;opacity:.85;font-weight:500}
+  header.top h1{font-size:19px;font-weight:700;display:flex;align-items:center;gap:8px}
+  .mode{margin-top:6px;font-size:11.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.16);padding:3px 9px;border-radius:999px}
+  .mode .dot{width:7px;height:7px;border-radius:50%;background:#ffd36b}
+  .mode.ok .dot{background:#9bf0c0}
+
+  nav.tabs{display:none}
+  nav.tabs .wrap{display:flex;gap:4px;padding-block:6px}
+  nav.tabs button{flex:1;appearance:none;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:14px;padding:9px 6px;border-radius:10px;cursor:pointer}
+  nav.tabs button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+
+  main{padding-bottom:40px}
+  section.panel{padding-block:16px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card+.card{margin-top:14px}
+  .card h2{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em;padding:13px 15px 0}
+
+  form .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 15px 15px}
+  .field{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .field.full{grid-column:1 / -1}
+  .field label{font-size:12.5px;font-weight:600;color:var(--muted)}
+  .field label .req{color:var(--warn)}
+  .field input,.field select,.field textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--fg)}
+  .field textarea{resize:vertical;min-height:62px;line-height:1.45}
+  .field input:focus,.field select,.field textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  .field .hint{font-size:11px;color:var(--muted)}
+  .nameadd{display:flex;gap:8px;align-items:stretch}
+  .nameadd input{flex:1;min-width:0}
+  .addbtn{flex:none;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:0 16px;font-weight:700;cursor:pointer}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+  .chips:empty{display:none}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:6px 7px 6px 12px;font-size:13.5px}
+  .chip button{background:none;border:0;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;padding:2px 4px;border-radius:50%}
+  .chip button:hover{color:var(--warn)}
+
+  .dir{display:flex;gap:8px}
+  .dir button{flex:1;appearance:none;border:1.5px solid var(--line);background:var(--surface-2);color:var(--muted);font-weight:700;font-size:15px;padding:12px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .dir button small{font-size:10.5px;font-weight:500}
+  .dir button[aria-pressed="true"][data-d="up"]{border-color:var(--up);color:var(--up);background:var(--accent-soft)}
+  .dir button[aria-pressed="true"][data-d="down"]{border-color:var(--down);color:var(--down);background:color-mix(in srgb,var(--down) 12%,transparent)}
+
+  .stepper{display:flex;align-items:stretch;gap:0;max-width:170px}
+  .stepper button{width:46px;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);font-size:22px;font-weight:600;cursor:pointer}
+  .stepper button:first-child{border-radius:10px 0 0 10px}
+  .stepper button:last-child{border-radius:0 10px 10px 0}
+  .stepper input{text-align:center;border-radius:0;border-left:0;border-right:0;font-weight:700;font-variant-numeric:tabular-nums}
+
+  .checks{display:flex;flex-direction:column;gap:2px;padding:4px 15px 14px}
+  .checks label{display:flex;align-items:center;gap:11px;padding:9px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+  .checks label:last-child{border-bottom:0}
+  .checks input{width:21px;height:21px;accent-color:var(--accent);flex:0 0 auto}
+  .checks .txt{font-size:14px}
+  .checkhead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:13px 15px 3px}
+  .checkhead h2{padding:0}
+  .checkall{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);border:0;border-radius:999px;padding:6px 12px;cursor:pointer}
+
+  .save-bar{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:12px 0 16px;margin-top:16px}
+  .btn{appearance:none;border:0;border-radius:12px;font-weight:700;font-size:16px;padding:15px;width:100%;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:var(--surface);color:var(--accent);border:1.5px solid var(--line)}
+  .btn.sm{font-size:14px;padding:11px;width:auto}
+
+  /* 기록 */
+  .recbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:14px 15px}
+  .recbar .field{flex:1;min-width:150px}
+  .summary{display:flex;gap:10px;padding:0 15px 14px;flex-wrap:wrap}
+  .stat{flex:1;min-width:92px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+  .stat .n{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+  .stat .l{font-size:11.5px;color:var(--muted);font-weight:500}
+  .exports{display:flex;gap:8px;flex-wrap:wrap;padding:0 15px 15px}
+
+  .entry{border-top:1px solid var(--line);padding:13px 15px}
+  .entry:first-of-type{border-top:0}
+  .entry .r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .chip{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px}
+  .chip.up{color:var(--up);background:var(--accent-soft)}
+  .chip.down{color:var(--down);background:color-mix(in srgb,var(--down) 12%,transparent)}
+  .entry .time{font-weight:700;font-variant-numeric:tabular-nums}
+  .entry .ppl{margin-left:auto;font-size:13px;color:var(--muted);font-weight:600}
+  .entry .r2{margin-top:6px;font-size:13.5px}
+  .entry .r2 .k{color:var(--muted)}
+  .entry .meta{margin-top:7px;display:flex;gap:7px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+  .entry .safety{font-weight:600}
+  .entry .safety.ok{color:var(--ok)} .entry .safety.no{color:var(--warn)}
+  .entry .del{margin-top:8px;font-size:12px;color:var(--warn);background:none;border:0;cursor:pointer;padding:2px 0;text-decoration:underline}
+  .empty{padding:36px 15px;text-align:center;color:var(--muted);font-size:14px}
+
+  /* QR */
+  .qrwrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px 15px 24px;text-align:center}
+  #qrbox{background:#fff;padding:16px;border-radius:16px;box-shadow:var(--shadow);display:inline-block;line-height:0}
+  #qrbox img,#qrbox canvas{display:block;width:220px;height:220px}
+  .qrwrap .url{font-size:12px;color:var(--muted);word-break:break-all;max-width:420px}
+  .notice{font-size:12.5px;color:var(--muted);background:var(--surface-2);border:1px dashed var(--line);border-radius:12px;padding:11px 13px;margin:0 15px 14px}
+
+  .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:999px;box-shadow:var(--shadow);z-index:50;opacity:0;transition:opacity .2s, transform .2s;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  @media (prefers-reduced-motion:reduce){.toast{transition:none}}
+  .pinmodal{position:fixed;inset:0;z-index:60;background:rgba(10,18,13,.55);display:flex;align-items:center;justify-content:center;padding:22px}
+  .pinmodal[hidden]{display:none}
+  .pinbox{width:100%;max-width:330px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:24px 22px;text-align:center}
+  .pinlock{font-size:30px}
+  .pintitle{font-size:18px;font-weight:800;margin-top:6px;color:var(--fg)}
+  .pindesc{font-size:12.5px;color:var(--muted);margin:7px 0 16px;line-height:1.5}
+  .pinbox input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:13px 14px;color:var(--fg);text-align:center;letter-spacing:.3em;font-size:18px;margin-bottom:10px}
+  .pinbox input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  .pinerr{color:var(--warn);font-size:12.5px;font-weight:600;margin-bottom:10px}
+  .pinbtns{display:flex;gap:9px;margin-top:4px}
+  .pinbtns .btn{flex:1;width:auto}
+
+  /* 겉표지 */
+  #cover{position:fixed;inset:0;z-index:100;background:linear-gradient(165deg,#2a8159,var(--accent) 40%,#0e3a26);color:#fff;display:flex;overflow:auto}
+  #cover[hidden]{display:none}
+  #cover .cwrap{margin:auto;width:100%;max-width:440px;display:flex;flex-direction:column;gap:20px;text-align:center;
+    padding:48px max(22px,env(safe-area-inset-left,0px)) calc(32px + env(safe-area-inset-bottom,0px)) max(22px,env(safe-area-inset-right,0px))}
+  #cover .site{font-size:12.5px;letter-spacing:.14em;opacity:.82;font-weight:600}
+  #cover .mark{font-weight:800;letter-spacing:.14em;line-height:1}
+  #cover .mark .ic{display:block;font-size:56px;margin-bottom:8px}
+  #cover .mark .w{font-size:68px}
+  #cover .ttl{font-size:17px;font-weight:600;opacity:.95;margin-top:-4px}
+  #cover .hr{height:1px;background:rgba(255,255,255,.25)}
+  .enter{appearance:none;border:0;cursor:pointer;border-radius:16px;font-family:inherit;color:#fff}
+  .enter.primary{position:relative;background:#fff;color:var(--accent);padding:19px 20px;box-shadow:0 12px 34px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;gap:14px}
+  .enter.primary .pic{font-size:30px}
+  .enter.primary .ptxt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;font-size:21px;font-weight:800}
+  .enter.primary small{font-weight:600;font-size:12px;opacity:.6;margin-top:2px}
+  .enter.primary.sec{background:rgba(255,255,255,.15);color:#fff;box-shadow:none}
+  .enter.primary.sec small{opacity:.78}
+  .enter.primary.sec:active{background:rgba(255,255,255,.26)}
+  .cmenu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .enter.mini{background:rgba(255,255,255,.15);padding:15px 8px;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .enter.mini .mi{font-size:21px}
+  .enter.mini:active{background:rgba(255,255,255,.28)}
+  #cover .cfoot{font-size:12px;opacity:.78;display:inline-flex;align-items:center;gap:7px;justify-content:center}
+  #cover .cfoot .dot{width:7px;height:7px;border-radius:50%;background:#ffd36b}
+  #cover .cfoot.ok .dot{background:#9bf0c0}
+  .cbadge{position:absolute;top:7px;right:10px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--warn);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+  .cbadge[hidden]{display:none}
+  .enter.mini{position:relative}
+
+  /* 허가 */
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:17px;height:17px;padding:0 4px;margin-left:5px;border-radius:999px;background:var(--warn);color:#fff;font-size:11px;font-weight:700;vertical-align:middle}
+  .badge[hidden]{display:none}
+  .chip.wait{color:#8a6d1f;background:#fbf0cf} .chip.appr{color:#fff;background:var(--ok)} .chip.rej{color:#fff;background:var(--warn)}
+  :root[data-theme="dark"] .chip.wait,:root:not([data-theme="light"]) .chip.wait{color:#f0d98a;background:#3a3114}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.wait{color:#f0d98a;background:#3a3114}}
+  .permit .r2{margin-top:6px}
+  .permit .contact{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .decide{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+  .decide input{flex:1;min-width:120px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px 10px;color:var(--fg);font-size:14px}
+  .decide .ap{background:var(--ok);color:#fff;border:0;border-radius:9px;font-weight:700;padding:9px 14px;font-size:14px;cursor:pointer}
+  .decide .rj{background:transparent;color:var(--warn);border:1.5px solid var(--warn);border-radius:9px;font-weight:700;padding:9px 14px;font-size:14px;cursor:pointer}
+  .permit .decinfo{margin-top:8px;font-size:12px;color:var(--muted)}
+</style>
+
+<section id="cover">
+  <div class="cwrap">
+    <div class="site">KBS대전방송총국 · 계룡산송신소</div>
+    <div class="mark"><span class="ic">🚠</span><span class="w">삭도</span></div>
+    <div class="hr"></div>
+    <button class="enter primary" onclick="enterApp('permit')">
+      <span class="pic">🚠</span>
+      <span class="ptxt">탑승자 사전등록<small>외부·군부대 사전 허가 신청</small></span>
+      <span class="cbadge" id="pendBadge2" hidden>0</span>
+    </button>
+    <button class="enter primary" onclick="enterApp('write')">
+      <span class="pic">✍️</span>
+      <span class="ptxt">탑승자 기록<small>운행·탑승자 기록 작성</small></span>
+    </button>
+    <div class="cmenu">
+      <button class="enter mini" onclick="enterApp('rec')"><span class="mi">📋</span>기록 조회</button>
+      <button class="enter mini" onclick="enterApp('qr')"><span class="mi">🔗</span>QR·공유</button>
+    </div>
+  </div>
+</section>
+
+<header class="top"><div class="wrap">
+  <button class="back" onclick="goCover()" aria-label="표지로 돌아가기">‹ 표지</button>
+  <div class="site">KBS대전방송총국 · 계룡산송신소</div>
+  <h1 onclick="goCover()" style="cursor:pointer" title="표지로 돌아가기">🚠 삭도 일일탑승일지</h1>
+</div></header>
+
+<nav class="tabs"><div class="wrap">
+  <button id="tab-write" aria-selected="true" onclick="showTab('write')">작성</button>
+  <button id="tab-rec" aria-selected="false" onclick="showTab('rec')">기록</button>
+  <button id="tab-permit" aria-selected="false" onclick="showTab('permit')">허가<span class="badge" id="pendBadge" hidden>0</span></button>
+  <button id="tab-qr" aria-selected="false" onclick="showTab('qr')">QR</button>
+</div></nav>
+
+<main class="wrap">
+  <!-- 작성 -->
+  <section class="panel" id="panel-write">
+    <form id="form" autocomplete="off">
+      <div class="card">
+        <div class="grid">
+          <div class="field full">
+            <label for="f-permit">사전허가 불러오기 (군부대·외부인)</label>
+            <select id="f-permit" onchange="applyPermit()">
+              <option value="">— 일반 운행 (허가 없음) —</option>
+            </select>
+            <span class="hint">승인된 허가를 선택하면 기관·인원·목적이 자동 입력됩니다.</span>
+          </div>
+          <div class="field">
+            <label for="f-date">운행일자 <span class="req">*</span></label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field">
+            <label for="f-time">운행시각 <span class="req">*</span></label>
+            <input type="time" id="f-time" required>
+          </div>
+          <div class="field full">
+            <label>운행구분 <span class="req">*</span></label>
+            <div class="dir" id="dir">
+              <button type="button" data-d="up" aria-pressed="true" onclick="setDir('up')">▲ 상행<small>하부 → 송신소</small></button>
+              <button type="button" data-d="down" aria-pressed="false" onclick="setDir('down')">▼ 하행<small>송신소 → 하부</small></button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="f-count">탑승인원 <span class="req">*</span></label>
+            <div class="stepper">
+              <button type="button" onclick="bump(-1)" aria-label="인원 감소">−</button>
+              <input type="number" id="f-count" min="0" max="20" value="1" inputmode="numeric">
+              <button type="button" onclick="bump(1)" aria-label="인원 증가">+</button>
+            </div>
+            <span class="hint">화물만 운반 시 0명</span>
+          </div>
+          <div class="field">
+            <label for="f-purpose">운행목적 <span class="req">*</span></label>
+            <select id="f-purpose">
+              <option>시설점검</option>
+              <option>장비 정비·수리</option>
+              <option>자재·물품 운반</option>
+              <option>예초·제초</option>
+              <option>청소·환경정비</option>
+              <option>안전·법정점검</option>
+              <option>외부인 안내</option>
+              <option>기타</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="f-riders">탑승자 성명</label>
+            <input type="text" id="f-riders" placeholder="예: 홍길동, 김철수">
+          </div>
+          <div class="field">
+            <label for="f-affil">소속</label>
+            <input type="text" id="f-affil" placeholder="송출부 / 외주 등">
+          </div>
+          <div class="field">
+            <label for="f-cargo">운반물 / 중량</label>
+            <input type="text" id="f-cargo" placeholder="예: 공구 20kg">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grid">
+          <div class="field">
+            <label for="f-operator">운전(조작)자 <span class="req">*</span></label>
+            <input type="text" id="f-operator" placeholder="조작 담당자">
+          </div>
+          <div class="field">
+            <label for="f-writer">작성자 <span class="req">*</span></label>
+            <input type="text" id="f-writer" placeholder="본인 성명">
+          </div>
+          <div class="field full">
+            <label for="f-notes">특이사항</label>
+            <textarea id="f-notes" placeholder="날씨, 지연, 고장, 점검 결과 등"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <button type="submit" class="btn" id="saveBtn">탑승 기록 저장</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 기록 -->
+  <section class="panel" id="panel-rec" hidden>
+    <div class="card">
+      <div class="recbar">
+        <div class="field">
+          <label for="r-date">조회 일자</label>
+          <input type="date" id="r-date" onchange="onRecDate()">
+        </div>
+        <button type="button" class="btn ghost sm" onclick="recDate(0)">오늘</button>
+      </div>
+      <div class="summary" id="summary"></div>
+      <div class="exports">
+        <button type="button" class="btn ghost sm" onclick="exportAll()">🗂 전체 CSV</button>
+        <button type="button" class="btn ghost sm" onclick="changePin()">🔑 PIN 변경</button>
+        <button type="button" class="btn ghost sm" onclick="lockApp()">🔒 잠금</button>
+      </div>
+    </div>
+    <div class="card" id="reclist" style="margin-top:14px"></div>
+  </section>
+
+  <!-- 허가 -->
+  <section class="panel" id="panel-permit" hidden>
+    <div class="card">
+      <h2>사전 탑승 허가 신청</h2>
+      <form id="pform" autocomplete="off">
+        <div class="grid">
+          <div class="field">
+            <label for="p-date">탑승 예정일 <span class="req">*</span></label>
+            <input type="date" id="p-date" required>
+          </div>
+          <div class="field">
+            <label for="p-count">예정 인원 <span class="req">*</span></label>
+            <input type="number" id="p-count" min="1" max="50" value="1" inputmode="numeric">
+          </div>
+          <div class="field full">
+            <label for="p-org">신청 기관 / 부대 <span class="req">*</span></label>
+            <input type="text" id="p-org" placeholder="예: ○○사단 ○○대대 / ○○통신">
+          </div>
+          <div class="field">
+            <label for="p-name">인솔자 성명 <span class="req">*</span></label>
+            <input type="text" id="p-name" placeholder="인솔·책임자">
+          </div>
+          <div class="field">
+            <label for="p-phone">연락처</label>
+            <input type="tel" id="p-phone" placeholder="010-0000-0000" inputmode="tel">
+          </div>
+          <div class="field full">
+            <label for="p-purpose">방문·탑승 목적 <span class="req">*</span></label>
+            <input type="text" id="p-purpose" placeholder="예: 통신시설 점검, 안테나 작업">
+          </div>
+          <div class="field full">
+            <label for="p-ridername">탑승자 명단</label>
+            <div class="nameadd">
+              <input type="text" id="p-ridername" placeholder="성명 입력 후 추가" autocomplete="off">
+              <button type="button" class="addbtn" id="p-addrider">추가</button>
+            </div>
+            <div class="chips" id="p-riderchips"></div>
+          </div>
+          <div class="field">
+            <label for="p-vehicle">차량 / 장비</label>
+            <input type="text" id="p-vehicle" placeholder="차량번호·반입장비 (선택)">
+          </div>
+          <div class="field">
+            <label for="p-cargokg">반입 화물 (kg)</label>
+            <input type="number" id="p-cargokg" placeholder="0" min="0" step="0.1" inputmode="decimal">
+          </div>
+          <div class="field full">
+            <label for="p-note">비고</label>
+            <input type="text" id="p-note" placeholder="특이사항 (선택)">
+          </div>
+          <div class="field">
+            <label for="p-applicant">신청 접수자 <span class="req">*</span></label>
+            <input type="text" id="p-applicant" placeholder="접수한 직원 성명">
+          </div>
+        </div>
+        <div style="padding:0 15px 16px">
+          <button type="submit" class="btn" id="pSaveBtn">탑승 신청</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="recbar">
+        <div class="field">
+          <label for="p-filter">상태별 보기</label>
+          <select id="p-filter" onchange="renderPermits()">
+            <option value="대기">대기 (미처리)</option>
+            <option value="승인">승인</option>
+            <option value="반려">반려</option>
+            <option value="all">전체</option>
+          </select>
+        </div>
+        <button type="button" class="btn ghost sm" onclick="exportPermits()">📄 허가목록 CSV</button>
+      </div>
+      <div id="plist"></div>
+    </div>
+  </section>
+
+  <!-- QR -->
+  <section class="panel" id="panel-qr" hidden>
+    <div class="notice">아래 QR을 캐빈·승강장 출입구에 붙여 두면, 누구나 폰 카메라로 찍어 바로 이 일지를 열 수 있습니다. 작성·조회는 KBS 계정으로 로그인한 경우 서로 공유됩니다.</div>
+    <div class="card">
+      <div class="qrwrap">
+        <div id="qrbox"><div class="empty" id="qrempty">게시 후 QR이 생성됩니다.</div></div>
+        <div class="url" id="qrurl"></div>
+        <button type="button" class="btn ghost sm" id="qrdl" onclick="downloadQR()" hidden>🖼 QR 이미지 내려받기</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="pinmodal" id="pinModal" hidden>
+  <div class="pinbox">
+    <div class="pinlock">🔒</div>
+    <div class="pintitle" id="pinTitle">PIN 입력</div>
+    <div class="pindesc" id="pinDesc">기록·허가 열람 PIN을 입력하세요.</div>
+    <input type="password" id="pinInput" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off">
+    <input type="password" id="pinInput2" inputmode="numeric" maxlength="8" placeholder="PIN 다시 입력" autocomplete="off" hidden>
+    <div class="pinerr" id="pinErr" hidden></div>
+    <div class="pinbtns">
+      <button type="button" class="btn ghost sm" id="pinCancel">취소</button>
+      <button type="button" class="btn sm" id="pinOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  "use strict";
+  // 게시 후 실제 아티팩트 주소로 채워집니다.
+  var ARTIFACT_URL = "https://claude.ai/artifact/BqUTKPpJg627opF7QPs2fk";
+
+  var C = (typeof window!=="undefined" && window.claude && typeof window.claude.use==="function") ? window.claude : null;
+  var db=null, downloads=null, mode="local", dayUnsub=null, day=[];
+  var permitsUnsub=null, permits=[];
+  var dir="up", currentDate=todayStr(), writeDenied=false;
+  var LKEY="sakdo_boarding_v1", DRAFT="sakdo_draft_v1", PKEY="sakdo_permits_v1";
+  var PINKEY="sakdo_pin_v1", UNLOCKKEY="sakdo_unlock_v1";
+  var appPin="", pinReady=false, pinPending=null, pinSetupMode=false;
+
+  var SAFE=["와이어로프·클립 상태","제동장치 작동","비상정지장치","무전·통신상태","탑승자 안전수칙"];
+
+  function $(id){return document.getElementById(id);}
+  function pad(n){return (n<10?"0":"")+n;}
+  function todayStr(){var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+  function nowTime(){var d=new Date();return pad(d.getHours())+":"+pad(d.getMinutes());}
+  function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+  function lsGet(k){try{return JSON.parse(localStorage.getItem(k)||"null");}catch(e){return null;}}
+  function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+  var toastT;
+  function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},2200);}
+
+  // ---- 탭 ----
+  window.showTab=function(n){
+    ["write","rec","permit","qr"].forEach(function(k){
+      $("panel-"+k).hidden=(k!==n);
+      $("tab-"+k).setAttribute("aria-selected", k===n?"true":"false");
+    });
+    if(n==="qr") renderQR();
+    if(n==="permit") renderPermits();
+    if(n==="write") fillPermitSelect();
+    setHeader(n);
+  };
+  function setHeader(n){
+    var titles={write:"일일탑승일지",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유"};
+    var h=document.querySelector("header.top h1");
+    if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
+  }
+  function openTab(tab){$("cover").hidden=true;showTab(tab);try{window.scrollTo(0,0);}catch(e){}}
+  window.enterApp=function(tab){
+    tab=tab||"write";
+    if(tab==="rec"){ requireUnlock(function(){openTab(tab);}); return; }
+    openTab(tab);
+  };
+  window.goCover=function(){$("cover").hidden=false;try{window.scrollTo(0,0);}catch(e){}};
+
+  // ---- PIN 잠금 (기록 조회·허가 처리) ----
+  function isUnlocked(){return lsGet(UNLOCKKEY)===1;}
+  function setUnlocked(){lsSet(UNLOCKKEY,1);}
+  window.lockApp=function(){try{localStorage.removeItem(UNLOCKKEY);}catch(e){}toast("잠갔습니다");goCover();};
+  function loadPin(){
+    if(mode==="shared"&&db){
+      return db.collection("config").doc("security").get().then(function(d){
+        appPin=(d&&d.exists&&d.data()&&d.data().pin)||""; pinReady=true;
+      }).catch(function(){appPin="";pinReady=true;});
+    }
+    appPin=lsGet(PINKEY)||""; pinReady=true; return Promise.resolve();
+  }
+  function setPin(pin,cb){
+    if(mode==="shared"&&db){
+      db.collection("config").doc("security").set({pin:pin}).then(function(){appPin=pin;cb&&cb();})
+        .catch(function(){showPinErr("PIN 저장 실패 — 편집 권한이 필요합니다");});
+    }else{ lsSet(PINKEY,pin); appPin=pin; cb&&cb(); }
+  }
+  function requireUnlock(then){
+    if(isUnlocked()){then();return;}
+    if(!pinReady){ loadPin().then(function(){openPinModal(then,false);}); }
+    else openPinModal(then,false);
+  }
+  function openPinModal(then,forceSetup){
+    pinPending=then||null;
+    pinSetupMode = forceSetup || !appPin;
+    $("pinTitle").textContent = pinSetupMode ? (appPin?"PIN 변경":"PIN 설정") : "PIN 입력";
+    $("pinDesc").textContent = pinSetupMode ? "기록·허가 열람에 쓸 PIN을 정하세요 (숫자 4자리 이상)." : "기록·허가 열람 PIN을 입력하세요.";
+    $("pinInput").value=""; $("pinInput2").value=""; $("pinInput2").hidden=!pinSetupMode;
+    $("pinErr").hidden=true; $("pinModal").hidden=false;
+    setTimeout(function(){$("pinInput").focus();},60);
+  }
+  function closePinModal(){$("pinModal").hidden=true;pinPending=null;}
+  function showPinErr(m){$("pinErr").textContent=m;$("pinErr").hidden=false;}
+  function submitPin(){
+    var v=$("pinInput").value.trim();
+    if(pinSetupMode){
+      var v2=$("pinInput2").value.trim();
+      if(!/^[0-9]{4,8}$/.test(v)){showPinErr("숫자 4~8자리로 정하세요");return;}
+      if(v!==v2){showPinErr("두 입력이 일치하지 않습니다");return;}
+      setPin(v,function(){ setUnlocked(); var cb=pinPending; closePinModal(); if(cb)cb(); else toast("PIN이 설정되었습니다"); });
+    }else{
+      if(v===appPin){ setUnlocked(); var cb=pinPending; closePinModal(); if(cb)cb(); }
+      else showPinErr("PIN이 일치하지 않습니다");
+    }
+  }
+  window.changePin=function(){ openPinModal(function(){toast("PIN이 변경되었습니다");}, true); };
+  if($("pinOk"))$("pinOk").addEventListener("click",submitPin);
+  if($("pinCancel"))$("pinCancel").addEventListener("click",closePinModal);
+  ["pinInput","pinInput2"].forEach(function(id){
+    var el=$(id);if(el)el.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submitPin();}});
+  });
+
+  // ---- 폼 보조 ----
+  window.setDir=function(d){dir=d;
+    document.querySelectorAll("#dir button").forEach(function(b){b.setAttribute("aria-pressed", b.dataset.d===d?"true":"false");});
+  };
+  window.bump=function(delta){var el=$("f-count");var v=parseInt(el.value||"0",10)||0;v=Math.max(0,Math.min(20,v+delta));el.value=v;};
+  window.checkAll=function(){
+    var boxes=document.querySelectorAll("#checks input");
+    var all=Array.prototype.every.call(boxes,function(b){return b.checked;});
+    boxes.forEach(function(b){b.checked=!all;});
+  };
+
+  // ---- 저장 ----
+  function collect(){
+    return {
+      date:$("f-date").value, time:$("f-time").value,
+      direction: dir==="up"?"상행":"하행",
+      count: parseInt($("f-count").value||"0",10)||0,
+      purpose:$("f-purpose").value,
+      riders:$("f-riders").value.trim(),
+      affiliation:$("f-affil").value.trim(),
+      cargo:$("f-cargo").value.trim(),
+      operator:$("f-operator").value.trim(),
+      writer:$("f-writer").value.trim(),
+      notes:$("f-notes").value.trim(),
+      permitId: $("f-permit")?$("f-permit").value:"",
+      permitOrg: ($("f-permit")&&$("f-permit").value)?($("f-permit").selectedOptions[0]?$("f-permit").selectedOptions[0].text:""):"",
+      createdAt:Date.now()
+    };
+  }
+
+  $("form").addEventListener("submit", function(e){
+    e.preventDefault();
+    var d=collect();
+    if(!d.date||!d.time){toast("일자·시각을 확인하세요");return;}
+    if(!d.operator){toast("운전(조작)자를 입력하세요");$("f-operator").focus();return;}
+    if(!d.writer){toast("작성자를 입력하세요");$("f-writer").focus();return;}
+    lsSet(DRAFT,{operator:d.operator,writer:d.writer,affiliation:d.affiliation});
+    var btn=$("saveBtn");btn.disabled=true;btn.textContent="저장 중…";
+    addEntry(d).then(function(){
+      btn.disabled=false;btn.textContent="탑승 기록 저장";
+      toast("저장되었습니다");
+      resetForm(d);
+    }).catch(function(err){
+      btn.disabled=false;btn.textContent="탑승 기록 저장";
+      if(err&&err.code==="invalid_argument"){
+        writeDenied=true;
+        toast("저장 권한이 없습니다 — 편집 가능 계정으로 열어 주세요");
+      }else{
+        toast("저장 실패 — 다시 시도해 주세요");
+      }
+    });
+  });
+
+  function resetForm(prev){
+    $("f-time").value=nowTime();
+    $("f-count").value=1;
+    $("f-riders").value="";$("f-cargo").value="";$("f-notes").value="";
+    document.querySelectorAll("#checks input").forEach(function(b){b.checked=false;});
+    if($("f-permit"))$("f-permit").value="";
+    // 일자·운전자·작성자·소속은 유지(연속 작성 편의)
+  }
+
+  function addEntry(d){
+    if(mode==="shared"){
+      return db.collection("entries").doc(genId()).set(d);
+    }
+    return new Promise(function(res){
+      var arr=lsGet(LKEY)||[];d.id=genId();arr.push(d);lsSet(LKEY,arr);
+      if(d.date===currentDate) refreshLocalDay();
+      res();
+    });
+  }
+  window.deleteEntry=function(id){
+    if(!confirmLike("이 기록을 삭제할까요?")) return;
+    if(mode==="shared"){
+      db.collection("entries").doc(id).delete().then(function(){toast("삭제됨");}).catch(function(){toast("삭제 권한이 없습니다");});
+    }else{
+      var arr=(lsGet(LKEY)||[]).filter(function(e){return e.id!==id;});lsSet(LKEY,arr);refreshLocalDay();toast("삭제됨");
+    }
+  };
+  // confirm()은 아티팩트에서 동작하지 않으므로 즉시 삭제 대신 2단계 토스트
+  var pendDel=null;
+  function confirmLike(){return true;}
+
+  // ---- 기록 조회 ----
+  window.onRecDate=function(){watchDay($("r-date").value);};
+  window.recDate=function(){$("r-date").value=todayStr();watchDay(todayStr());};
+
+  function watchDay(dt){
+    currentDate=dt;
+    if(dayUnsub){dayUnsub();dayUnsub=null;}
+    if(mode==="shared"){
+      dayUnsub=db.collection("entries").where("date","==",dt).onSnapshot(function(snap){
+        day=snap.docs.map(function(x){var o=Object.assign({},x.data()||{});o.id=x.id;return o;});
+        sortDay();renderRecords();
+      },function(){ /* 일시 오류는 자동 복구 */ });
+    }else{
+      refreshLocalDay();
+    }
+  }
+  function refreshLocalDay(){
+    day=(lsGet(LKEY)||[]).filter(function(e){return e.date===currentDate;});
+    sortDay();renderRecords();
+  }
+  function sortDay(){day.sort(function(a,b){return (a.time||"").localeCompare(b.time||"")|| (a.createdAt||0)-(b.createdAt||0);});}
+
+  function safetyInfo(e){
+    var s=e.safety||{};var miss=SAFE.filter(function(k){return !s[k];});
+    return {ok:miss.length===0, n:SAFE.length-miss.length, miss:miss};
+  }
+  function renderRecords(){
+    var trips=day.length, people=day.reduce(function(a,e){return a+(e.count||0);},0);
+    var up=day.filter(function(e){return e.direction==="상행";}).length;
+    $("summary").innerHTML=
+      stat(trips,"운행 횟수")+stat(people,"연 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행");
+    var list=$("reclist");
+    if(!trips){list.innerHTML='<div class="empty">'+fmtDate(currentDate)+' 기록이 없습니다.</div>';return;}
+    list.innerHTML=day.map(function(e){
+      var dcl=e.direction==="상행"?"up":"down";
+      return '<div class="entry">'+
+        '<div class="r1"><span class="time">'+esc(e.time||"")+'</span>'+
+          '<span class="chip '+dcl+'">'+esc(e.direction||"")+'</span>'+
+          '<span class="ppl">'+ (e.count||0) +'명</span></div>'+
+        '<div class="r2"><span class="k">목적</span> '+esc(e.purpose||"-")+
+          (e.riders?' · <span class="k">탑승</span> '+esc(e.riders):"")+
+          (e.cargo?' · <span class="k">운반</span> '+esc(e.cargo):"")+'</div>'+
+        (e.notes?'<div class="r2"><span class="k">특이</span> '+esc(e.notes)+'</div>':"")+
+        '<div class="meta">'+
+          '<span>운전 '+esc(e.operator||"-")+'</span>'+
+          '<span>작성 '+esc(e.writer||"-")+(e.affiliation?" ("+esc(e.affiliation)+")":"")+'</span>'+
+        '</div>'+
+        '<button class="del" onclick="deleteEntry(\''+e.id+'\')">삭제</button>'+
+      '</div>';
+    }).join("");
+  }
+  function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function fmtDate(s){if(!s)return"";var p=s.split("-");return p[0]+"년 "+(+p[1])+"월 "+(+p[2])+"일";}
+
+  // ---- CSV ----
+  function safetyText(e){var si=safetyInfo(e);return si.ok?"전항목 확인(5/5)":("확인 "+si.n+"/5, 미확인: "+si.miss.join(" "));}
+  function csvCell(v){v=(v==null?"":String(v));return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+  function splitNames(s){return String(s||"").split(/[\s,;/·、]+/).map(function(x){return x.trim();}).filter(Boolean);}
+  // 고정 열 뒤에 탑승자 이름을 한 칸씩(탑승자1, 탑승자2 …) 펼쳐서 CSV 생성
+  function buildCSV(rows,cols,nameField){
+    var maxN=0;rows.forEach(function(r){var n=splitNames(r[nameField]).length;if(n>maxN)maxN=n;});
+    var header=cols.map(function(c){return c[1];});
+    for(var i=1;i<=maxN;i++)header.push("탑승자"+i);
+    var out=[header.map(csvCell).join(",")];
+    rows.forEach(function(r){
+      var line=cols.map(function(c){return csvCell(r[c[0]]);});
+      var names=splitNames(r[nameField]);
+      for(var j=0;j<maxN;j++)line.push(csvCell(names[j]||""));
+      out.push(line.join(","));
+    });
+    return "﻿"+out.join("\r\n");
+  }
+  function toCSV(rows){
+    var prepared=rows.map(function(e){var r=Object.assign({},e);r.createdText=e.createdAt?new Date(e.createdAt).toLocaleString("ko-KR"):"";return r;});
+    var cols=[["date","운행일자"],["time","운행시각"],["direction","구분"],["count","인원"],["purpose","운행목적"],["affiliation","소속"],["cargo","운반물/중량"],["operator","운전(조작)자"],["notes","특이사항"],["writer","작성자"],["createdText","작성시각"]];
+    return buildCSV(prepared,cols,"riders");
+  }
+  function saveFile(name,data,type){
+    if(downloads){
+      downloads.save({filename:name,data:data}).catch(function(err){
+        if(err&&err.code!=="declined") toast("내보내기를 사용할 수 없습니다");
+      });
+    }else{
+      try{var blob=(data instanceof Blob)?data:new Blob([data],{type:type||"text/plain"});
+        var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();
+        setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
+      }catch(e){toast("저장할 수 없습니다");}
+    }
+  }
+  window.exportAll=function(){
+    getAll().then(function(rows){
+      if(!rows.length){toast("기록이 없습니다");return;}
+      rows.sort(function(a,b){return (a.date||"").localeCompare(b.date||"")||(a.time||"").localeCompare(b.time||"");});
+      saveFile("삭도탑승일지_전체.csv", toCSV(rows), "text/csv");
+    });
+  };
+  function getAll(){
+    if(mode==="shared"){return db.collection("entries").get().then(function(s){return s.docs.map(function(x){var o=Object.assign({},x.data()||{});o.id=x.id;return o;});});}
+    return Promise.resolve(lsGet(LKEY)||[]);
+  }
+
+  // ---- 사전 허가 ----
+  function savedWriter(){var d=lsGet(DRAFT)||{};return d.writer||d.applicant||"";}
+
+  // 탑승자 명단: 이름 추가/삭제
+  var riderNames=[];
+  function renderRiderChips(){
+    var box=$("p-riderchips");if(!box)return;
+    box.innerHTML=riderNames.map(function(n,i){
+      return '<span class="chip">'+esc(n)+'<button type="button" onclick="removeRider('+i+')" aria-label="삭제">✕</button></span>';
+    }).join("");
+    if(riderNames.length){$("p-count").value=riderNames.length;}
+  }
+  function addRiderName(){
+    var inp=$("p-ridername");if(!inp)return;
+    var parts=inp.value.split(/[\s,;/·、]+/).map(function(x){return x.trim();}).filter(Boolean);
+    parts.forEach(function(n){if(riderNames.indexOf(n)<0)riderNames.push(n);});
+    inp.value="";renderRiderChips();inp.focus();
+  }
+  window.removeRider=function(i){riderNames.splice(i,1);renderRiderChips();};
+  if($("p-addrider"))$("p-addrider").addEventListener("click",addRiderName);
+  if($("p-ridername"))$("p-ridername").addEventListener("keydown",function(e){
+    if(e.key==="Enter"){e.preventDefault();addRiderName();}
+  });
+
+  $("pform").addEventListener("submit", function(e){
+    e.preventDefault();
+    var org=$("p-org").value.trim(), name=$("p-name").value.trim(), purpose=$("p-purpose").value.trim(), applicant=$("p-applicant").value.trim();
+    var vdate=$("p-date").value;
+    if(!vdate){toast("탑승 예정일을 입력하세요");return;}
+    if(!org){toast("신청 기관/부대를 입력하세요");$("p-org").focus();return;}
+    if(!name){toast("담당자 성명을 입력하세요");$("p-name").focus();return;}
+    if(!purpose){toast("방문 목적을 입력하세요");$("p-purpose").focus();return;}
+    if(!applicant){toast("신청 접수자를 입력하세요");$("p-applicant").focus();return;}
+    var p={status:"대기", visitDate:vdate, count:parseInt($("p-count").value||"1",10)||1,
+      org:org, contactName:name, contactPhone:$("p-phone").value.trim(), purpose:purpose,
+      riders:riderNames.join(", "), vehicle:$("p-vehicle").value.trim(), cargoKg:$("p-cargokg").value.trim(), note:$("p-note").value.trim(),
+      applicant:applicant, decidedBy:"", decidedAt:0, createdAt:Date.now()};
+    lsSet(DRAFT, Object.assign(lsGet(DRAFT)||{}, {applicant:applicant}));
+    var btn=$("pSaveBtn");btn.disabled=true;btn.textContent="등록 중…";
+    addPermit(p).then(function(){
+      btn.disabled=false;btn.textContent="탑승 신청";
+      toast("탑승 신청이 등록되었습니다 (대기)");
+      $("pform").reset();$("p-date").value=todayStr();$("p-count").value=1;$("p-applicant").value=applicant;
+      riderNames=[];renderRiderChips();
+      $("p-filter").value="대기";renderPermits();
+    }).catch(function(err){
+      btn.disabled=false;btn.textContent="탑승 신청";
+      toast(err&&err.code==="invalid_argument"?"등록 권한이 없습니다 — 편집 가능 계정으로 열어 주세요":"등록 실패 — 다시 시도하세요");
+    });
+  });
+
+  function addPermit(p){
+    if(mode==="shared"){return db.collection("permits").doc(genId()).set(p);}
+    return new Promise(function(res){var arr=lsGet(PKEY)||[];p.id=genId();arr.push(p);lsSet(PKEY,arr);refreshLocalPermits();res();});
+  }
+
+  window.decidePermit=function(id,decision){
+    requireUnlock(function(){decidePermitDo(id,decision);});
+  };
+  function decidePermitDo(id,decision){
+    var inp=$("dn-"+id);var who=(inp&&inp.value.trim())||savedWriter();
+    if(!who){toast("처리자 성명을 입력하세요");inp&&inp.focus();return;}
+    var cur=permits.filter(function(x){return x.id===id;})[0];
+    var org=cur?cur.org:"";
+    var patch={status:decision, decidedBy:who, decidedAt:Date.now()};
+    var done=function(){
+      if(cur)Object.assign(cur,patch);      // 즉시 반영
+      $("p-filter").value=decision;          // 처리 결과 목록으로 전환 → 저장된 것이 보임
+      renderPermits();
+      toast("✓ "+decision+" 저장됨"+(org?" · "+org:""));
+    };
+    if(mode==="shared"){
+      db.collection("permits").doc(id).update(patch).then(done).catch(function(err){
+        toast(err&&err.code==="invalid_argument"?"처리 권한이 없습니다":"처리 실패 — 다시 시도하세요");
+      });
+    }else{
+      var arr=lsGet(PKEY)||[];arr.forEach(function(p){if(p.id===id)Object.assign(p,patch);});lsSet(PKEY,arr);
+      permits=arr;sortPermits();updatePendBadge();done();
+    }
+  };
+
+  function watchPermits(){
+    if(permitsUnsub){permitsUnsub();permitsUnsub=null;}
+    if(mode==="shared"){
+      permitsUnsub=db.collection("permits").onSnapshot(function(snap){
+        permits=snap.docs.map(function(x){var o=Object.assign({},x.data()||{});o.id=x.id;return o;});
+        sortPermits();afterPermits();
+      },function(){});
+    }else{refreshLocalPermits();}
+  }
+  function refreshLocalPermits(){permits=lsGet(PKEY)||[];sortPermits();afterPermits();}
+  function sortPermits(){permits.sort(function(a,b){return (b.createdAt||0)-(a.createdAt||0);});}
+  function afterPermits(){updatePendBadge();if(!$("panel-permit").hidden)renderPermits();fillPermitSelect();}
+
+  function updatePendBadge(){
+    var n=permits.filter(function(p){return p.status==="대기";}).length;
+    [$("pendBadge"),$("pendBadge2")].forEach(function(b){if(!b)return;if(n>0){b.textContent=n;b.hidden=false;}else{b.hidden=true;}});
+  }
+
+  window.renderPermits=function(){
+    var f=$("p-filter").value;
+    var rows=permits.filter(function(p){return f==="all"?true:p.status===f;});
+    var list=$("plist");
+    if(!rows.length){list.innerHTML='<div class="empty">해당 상태의 신청이 없습니다.</div>';return;}
+    list.innerHTML=rows.map(function(p){
+      var cls=p.status==="승인"?"appr":p.status==="반려"?"rej":"wait";
+      var dec=(p.status!=="대기")?'<div class="decinfo">'+esc(p.status)+' 처리 · '+esc(p.decidedBy||"")+(p.decidedAt?" · "+new Date(p.decidedAt).toLocaleString("ko-KR"):"")+'</div>':'';
+      var actions=(p.status==="대기")?
+        '<div class="decide"><input id="dn-'+p.id+'" placeholder="처리자 성명" value="'+esc(savedWriter())+'">'+
+        '<button class="ap" onclick="decidePermit(\''+p.id+'\',\'승인\')">승인</button>'+
+        '<button class="rj" onclick="decidePermit(\''+p.id+'\',\'반려\')">반려</button></div>':'';
+      return '<div class="entry permit">'+
+        '<div class="r1"><span class="time">'+esc(fmtDate(p.visitDate))+'</span>'+
+          '<span class="chip '+cls+'">'+esc(p.status)+'</span>'+
+          '<span class="ppl">'+(p.count||0)+'명</span></div>'+
+        '<div class="r2"><b>'+esc(p.org)+'</b> · '+esc(p.purpose||"")+'</div>'+
+        (p.riders?'<div class="r2"><span class="k">탑승자</span> '+esc(p.riders)+'</div>':"")+
+        (p.vehicle?'<div class="r2"><span class="k">차량/장비</span> '+esc(p.vehicle)+'</div>':"")+
+        (p.cargoKg?'<div class="r2"><span class="k">반입화물</span> '+esc(p.cargoKg)+' kg</div>':"")+
+        (p.note?'<div class="r2"><span class="k">비고</span> '+esc(p.note)+'</div>':"")+
+        '<div class="contact">인솔자 '+esc(p.contactName||"-")+(p.contactPhone?" · "+esc(p.contactPhone):"")+' · 접수 '+esc(p.applicant||"-")+'</div>'+
+        dec+actions+
+      '</div>';
+    }).join("");
+  };
+
+  function fillPermitSelect(){
+    var sel=$("f-permit");if(!sel)return;
+    var cur=sel.value;
+    var appr=permits.filter(function(p){return p.status==="승인";});
+    var opts='<option value="">— 일반 운행 (허가 없음) —</option>';
+    appr.forEach(function(p){opts+='<option value="'+p.id+'">'+esc(fmtDate(p.visitDate))+' · '+esc(p.org)+' ('+(p.count||0)+'명)</option>';});
+    sel.innerHTML=opts;
+    if(cur)sel.value=cur;
+  }
+  window.applyPermit=function(){
+    var id=$("f-permit").value;if(!id)return;
+    var p=permits.filter(function(x){return x.id===id;})[0];if(!p)return;
+    $("f-affil").value=p.org||"";
+    if(p.riders)$("f-riders").value=p.riders;
+    if(p.count)$("f-count").value=p.count;
+    var cargoBits=[];if(p.vehicle)cargoBits.push(p.vehicle);if(p.cargoKg)cargoBits.push(p.cargoKg+"kg");
+    if(cargoBits.length)$("f-cargo").value=cargoBits.join(" · ");
+    var ps=$("f-purpose"),found=false,i;
+    for(i=0;i<ps.options.length;i++){if(ps.options[i].value===p.purpose){ps.selectedIndex=i;found=true;break;}}
+    if(!found){for(i=0;i<ps.options.length;i++){if(ps.options[i].value==="외부인 안내"){ps.selectedIndex=i;break;}}}
+    toast("허가 정보가 입력되었습니다");
+  };
+
+  window.exportPermits=function(){
+    if(!permits.length){toast("신청 내역이 없습니다");return;}
+    saveFile("삭도탑승허가_목록.csv", permitsCSV(permits), "text/csv");
+  };
+  function permitsCSV(rows){
+    var prepared=rows.map(function(e){var r=Object.assign({},e);r.decidedText=e.decidedAt?new Date(e.decidedAt).toLocaleString("ko-KR"):"";return r;});
+    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["note","비고"],["applicant","접수자"],["decidedBy","처리자"],["decidedText","처리일시"]];
+    return buildCSV(prepared,cols,"riders");
+  }
+
+  // ---- QR ----
+  var qrDone=false;
+  function renderQR(){
+    if(!ARTIFACT_URL){ $("qrempty")&&($("qrempty").textContent="게시 후 QR이 생성됩니다."); return; }
+    $("qrurl").textContent=ARTIFACT_URL;
+    $("qrdl").hidden=false;
+    if(qrDone||typeof QRCode==="undefined") return;
+    var box=$("qrbox");box.innerHTML="";
+    try{ new QRCode(box,{text:ARTIFACT_URL,width:220,height:220,correctLevel:QRCode.CorrectLevel.M}); qrDone=true; }
+    catch(e){ box.innerHTML='<div class="empty">QR 생성 실패</div>'; }
+  }
+  window.downloadQR=function(){
+    var img=document.querySelector("#qrbox img")||document.querySelector("#qrbox canvas");
+    if(!img){toast("QR이 아직 없습니다");return;}
+    try{
+      var cv=document.createElement("canvas");cv.width=560;cv.height=640;
+      var g=cv.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,560,640);
+      var src=img.tagName==="CANVAS"?img:img;
+      g.drawImage(src,40,40,480,480);
+      g.fillStyle="#111";g.textAlign="center";
+      g.font="bold 30px 'Malgun Gothic',sans-serif";g.fillText("계룡산 삭도 일일탑승일지",280,560);
+      g.font="20px 'Malgun Gothic',sans-serif";g.fillStyle="#555";g.fillText("QR을 찍어 탑승일지를 작성하세요",280,598);
+      cv.toBlob(function(b){ saveFile("삭도일지_QR.png", b, "image/png"); }, "image/png");
+    }catch(e){ toast("이미지를 만들 수 없습니다"); }
+  };
+
+  // ---- 초기화 ----
+  function reflectMode(){
+    var m=$("mode"),t=$("modetxt"),cm=$("coverMode"),ct=$("coverModeTxt");
+    if(mode==="shared"){if(m)m.classList.add("ok");if(t)t.textContent="공유 모드 · 기록이 함께 모입니다";
+      if(cm)cm.classList.add("ok");if(ct)ct.textContent="공유 모드 · 기록이 함께 모입니다";}
+    else{if(m)m.classList.remove("ok");if(t)t.textContent="이 기기 저장 모드 (로그인 시 공유)";
+      if(cm)cm.classList.remove("ok");if(ct)ct.textContent="이 기기 저장 모드 (로그인 시 공유)";}
+  }
+
+  function start(){
+    $("f-date").value=todayStr();
+    $("f-time").value=nowTime();
+    $("r-date").value=todayStr();
+    $("p-date").value=todayStr();
+    var dr=lsGet(DRAFT);
+    if(dr){$("f-operator").value=dr.operator||"";$("f-writer").value=dr.writer||"";$("f-affil").value=dr.affiliation||"";$("p-applicant").value=dr.applicant||dr.writer||"";}
+
+    if(C){
+      Promise.resolve(C.use("db")).then(function(x){db=x;}).catch(function(){db=null;})
+      .then(function(){ return Promise.resolve(C.use("downloads")).then(function(x){downloads=x;}).catch(function(){downloads=null;}); })
+      .then(function(){
+        mode=db?"shared":"local";
+        reflectMode();
+        loadPin();
+        watchDay(currentDate);
+        watchPermits();
+      });
+    }else{
+      mode="local";reflectMode();loadPin();watchDay(currentDate);watchPermits();
+    }
+  }
+  if(document.readyState!=="loading") start();
+  else document.addEventListener("DOMContentLoaded",start);
+})();
+</script>
