@@ -234,7 +234,7 @@
           <div class="field full">
             <label for="f-permit">사전허가 불러오기 (군부대·외부인)</label>
             <select id="f-permit" onchange="applyPermit()">
-              <option value="">— 일반 운행 (허가 없음) —</option>
+              <option value="">— 일반 운행 —</option>
             </select>
             <span class="hint">승인된 허가를 선택하면 기관·인원·목적이 자동 입력됩니다.</span>
           </div>
@@ -539,7 +539,7 @@
     setHeader(n);
   };
   function setHeader(n){
-    var titles={write:"일일탑승일지",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유"};
+    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유"};
     var h=document.querySelector("header.top h1");
     if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
   }
@@ -920,7 +920,7 @@
     var sel=$("f-permit");if(!sel)return;
     var cur=sel.value;
     var appr=permits.filter(function(p){return p.status==="승인";});
-    var opts='<option value="">— 일반 운행 (허가 없음) —</option>';
+    var opts='<option value="">— 일반 운행 —</option>';
     appr.forEach(function(p){opts+='<option value="'+p.id+'">'+esc(fmtDate(p.visitDate))+' · '+esc(p.org)+' ('+(p.count||0)+'명)</option>';});
     sel.innerHTML=opts;
     if(cur)sel.value=cur;
