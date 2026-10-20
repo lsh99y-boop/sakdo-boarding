@@ -304,7 +304,7 @@
             <span class="hint">화물만 운반 시 0명</span>
           </div>
           <div class="field">
-            <label for="f-purpose">운행목적 <span class="req">*</span></label>
+            <label for="f-purpose">탑승목적 <span class="req">*</span></label>
             <select id="f-purpose">
               <option>시설점검</option>
               <option>장비 정비·수리</option>
@@ -885,7 +885,7 @@
   }
   function toCSV(rows){
     var prepared=rows.map(function(e){var r=Object.assign({},e);r.createdText=e.createdAt?new Date(e.createdAt).toLocaleString("ko-KR"):"";return r;});
-    var cols=[["date","운행일자"],["time","운행시각"],["direction","구분"],["count","인원"],["purpose","운행목적"],["affiliation","소속"],["cargo","운반물/중량"],["operator","운전(조작)자"],["notes","특이사항"],["createdText","작성시각"]];
+    var cols=[["date","운행일자"],["time","운행시각"],["direction","구분"],["count","인원"],["purpose","탑승목적"],["affiliation","소속"],["cargo","운반물/중량"],["operator","운전(조작)자"],["notes","특이사항"],["createdText","작성시각"]];
     return buildCSV(prepared,cols,"riders");
   }
   function saveFile(name,data,type){
