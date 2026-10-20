@@ -1037,8 +1037,7 @@
     $("f-affil").value=p.org||"";
     if(p.riders)$("f-riders").value=p.riders;
     if(p.count)$("f-count").value=p.count;
-    var cargoBits=[];if(p.vehicle)cargoBits.push(p.vehicle);if(p.cargoKg)cargoBits.push(p.cargoKg+"kg");
-    if(cargoBits.length)$("f-cargo").value=cargoBits.join(" · ");
+    if(p.cargoKg)$("f-cargo").value=p.cargoKg+"kg";   // 반입 화물(kg)만 운반물/중량에. 차량번호는 넣지 않음
     var ps=$("f-purpose"),found=false,i;
     for(i=0;i<ps.options.length;i++){if(ps.options[i].value===p.purpose){ps.selectedIndex=i;found=true;break;}}
     if(!found){for(i=0;i<ps.options.length;i++){if(ps.options[i].value==="외부인 안내"){ps.selectedIndex=i;break;}}}
