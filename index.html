@@ -70,7 +70,7 @@
   /* 탑승예정일·예정인원은 항상 한 줄에. minmax(0,…)+overflow로 날짜칸이 자기 칸을 넘지 못하게(iOS 대응) */
   .pair{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:16px;align-items:stretch}
   .pair .field{min-width:0}
-  #f-date,#f-time{text-align:left;max-width:220px}  /* 왼쪽 정렬 + 박스 폭 축소(전체폭 X) */
+  #f-date,#f-time{text-align:left}  /* 사전허가 불러오기 등 다른 박스와 동일한 전체폭, 값만 왼쪽 정렬 */
   .pair .field input{flex:1 1 auto}  /* 날짜·인원 박스 높이 동일하게 */
   .pair #p-date{width:100%;max-width:100%}
   .pair #p-count{text-align:center}
