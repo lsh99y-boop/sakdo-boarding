@@ -67,9 +67,12 @@
   /* 좁은 폰에서는 날짜/시각 등 입력칸이 안 줄어들어 2열이 겹치므로 1열로 */
   @media (max-width:500px){ form .grid{grid-template-columns:1fr} }
   .field input,.field select{min-width:0}
-  /* 탑승예정일(넓게)·예정인원(좁게)은 항상 한 줄에 */
-  .pair{grid-column:1 / -1;display:grid;grid-template-columns:1.7fr 1fr;gap:12px}
+  /* 탑승예정일(남는 공간 전부)·예정인원(좁은 고정폭)은 항상 한 줄에 */
+  .pair{grid-column:1 / -1;display:grid;grid-template-columns:1fr 96px;gap:10px;align-items:end}
   .pair .field{min-width:0}
+  .pair #p-count{text-align:center}
+  /* iOS 날짜 입력칸은 잘 안 줄어들어 넘치므로 폰에서는 글자를 조금 줄여 칸 안에 들어오게 */
+  @media (max-width:430px){ #p-date{font-size:15px;padding-left:10px;padding-right:6px} }
   .field{display:flex;flex-direction:column;gap:6px;min-width:0}
   .field.full{grid-column:1 / -1}
   .field label{font-size:12.5px;font-weight:600;color:var(--muted)}
