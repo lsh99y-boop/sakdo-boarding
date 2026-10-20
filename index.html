@@ -143,7 +143,7 @@
   .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);font-size:13.5px;font-weight:600;padding:11px 18px;border-radius:999px;box-shadow:var(--shadow);z-index:50;opacity:0;transition:opacity .2s, transform .2s;pointer-events:none}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   @media (prefers-reduced-motion:reduce){.toast{transition:none}}
-  .pinmodal{position:fixed;inset:0;z-index:60;background:rgba(10,18,13,.55);display:flex;align-items:center;justify-content:center;padding:22px}
+  .pinmodal{position:fixed;inset:0;z-index:200;background:rgba(10,18,13,.55);display:flex;align-items:center;justify-content:center;padding:22px}
   .pinmodal[hidden]{display:none}
   .pinbox{width:100%;max-width:330px;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px rgba(0,0,0,.35);padding:24px 22px;text-align:center}
   .pinlock{font-size:30px}
