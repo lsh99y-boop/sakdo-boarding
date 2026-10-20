@@ -1,5 +1,14 @@
-<meta name="claude:viewport-fit-sides" content="cover">
-<title>계룡산 삭도 일일탑승일지</title>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>계룡산(송) 삭도 탑승·운행 기록</title>
+<meta name="description" content="계룡산송신소 삭도(케이블카) 탑승·운행 기록 및 사전 탑승 허가 신청">
+<meta property="og:title" content="계룡산(송) 삭도 탑승·운행 기록">
+<meta property="og:description" content="계룡산송신소 삭도 탑승·운행 기록 / 사전 탑승 허가 신청">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#1f6b47">
 <style>
   /* 레이아웃: 상단 고정 헤더 + 탭(작성·기록·QR) 세로 스크롤, 모바일 1열 폼 */
   :root{
@@ -190,6 +199,8 @@
   .decide .rj{background:transparent;color:var(--warn);border:1.5px solid var(--warn);border-radius:9px;font-weight:700;padding:9px 14px;font-size:14px;cursor:pointer}
   .permit .decinfo{margin-top:8px;font-size:12px;color:var(--muted)}
 </style>
+</head>
+<body>
 
 <section id="cover">
   <div class="cwrap">
@@ -969,7 +980,7 @@
       var src=img.tagName==="CANVAS"?img:img;
       g.drawImage(src,40,40,480,480);
       g.fillStyle="#111";g.textAlign="center";
-      g.font="bold 30px 'Malgun Gothic',sans-serif";g.fillText("계룡산 삭도 일일탑승일지",280,560);
+      g.font="bold 30px 'Malgun Gothic',sans-serif";g.fillText("계룡산(송) 삭도 탑승·운행 기록",280,560);
       g.font="20px 'Malgun Gothic',sans-serif";g.fillStyle="#555";g.fillText("QR을 찍어 탑승일지를 작성하세요",280,598);
       cv.toBlob(function(b){ saveFile("삭도일지_QR.png", b, "image/png"); }, "image/png");
     }catch(e){ toast("이미지를 만들 수 없습니다"); }
@@ -1003,3 +1014,5 @@
   else document.addEventListener("DOMContentLoaded",start);
 })();
 </script>
+</body>
+</html>
