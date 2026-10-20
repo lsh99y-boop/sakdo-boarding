@@ -115,7 +115,8 @@
   .stat{flex:1;min-width:92px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
   .stat .n{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
   .stat .l{font-size:11.5px;color:var(--muted);font-weight:500}
-  .exports{display:flex;gap:8px;flex-wrap:wrap;padding:0 15px 15px}
+  .quickrange{display:flex;gap:8px;flex-wrap:wrap;padding:0 15px 4px}
+  .exports{display:flex;gap:8px;flex-wrap:wrap;padding:12px 15px 15px}
 
   .entry{border-top:1px solid var(--line);padding:13px 15px}
   .entry:first-of-type{border-top:0}
@@ -340,10 +341,18 @@
     <div class="card">
       <div class="recbar">
         <div class="field">
-          <label for="r-date">조회 일자</label>
-          <input type="date" id="r-date" onchange="onRecDate()">
+          <label for="r-from">시작일</label>
+          <input type="date" id="r-from" onchange="onRecRange()">
         </div>
-        <button type="button" class="btn ghost sm" onclick="recDate(0)">오늘</button>
+        <div class="field">
+          <label for="r-to">종료일</label>
+          <input type="date" id="r-to" onchange="onRecRange()">
+        </div>
+      </div>
+      <div class="quickrange">
+        <button type="button" class="btn ghost sm" onclick="rangeToday()">오늘</button>
+        <button type="button" class="btn ghost sm" onclick="rangeDays(7)">최근 7일</button>
+        <button type="button" class="btn ghost sm" onclick="rangeMonth()">이번 달</button>
       </div>
       <div class="summary" id="summary"></div>
       <div class="exports">
@@ -493,7 +502,7 @@
   var sb = (window.supabase && window.SUPABASE_URL && window.SUPABASE_ANON_KEY
             && window.SUPABASE_URL.indexOf("<")<0 && window.SUPABASE_ANON_KEY.indexOf("<")<0)
     ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY) : null;
-  var db=null, downloads=null, mode="local", dayUnsub=null, day=[];
+  var db=null, downloads=null, mode="local", dayUnsub=null, day=[], rangeFrom="", rangeTo="";
   var permitsUnsub=null, permits=[];
   var dir="up", currentDate=todayStr(), writeDenied=false;
 
@@ -504,10 +513,14 @@
   function makeSupabaseDB(client){
     function collection(name){
       var tbl=TBL_PREFIX+name;
-      var flt=null;
+      var flts=[];
       function fetchDocs(){
         var q=client.from(tbl).select("id,payload");
-        if(flt) q=q.eq("payload->>"+flt.field, flt.val);
+        flts.forEach(function(f){ var col="payload->>"+f.field;
+          if(f.op===">=") q=q.gte(col,f.val);
+          else if(f.op==="<=") q=q.lte(col,f.val);
+          else q=q.eq(col,f.val);
+        });
         return q.then(function(r){ chk(r); var rows=r.data||[];
           return { docs: rows.map(function(row){ return { id:row.id, data:function(){return row.payload;} }; }) };
         });
@@ -533,7 +546,7 @@
             delete:function(){ return client.from(tbl).delete().eq("id",id).then(chk); }
           };
         },
-        where:function(field,op,val){ flt={field:field,val:val}; return api; },
+        where:function(field,op,val){ flts.push({field:field,op:op,val:val}); return api; },
         get:fetchDocs,
         onSnapshot:function(cb){
           var active=true;
@@ -757,7 +770,7 @@
     }
     return new Promise(function(res){
       var arr=lsGet(LKEY)||[];d.id=genId();arr.push(d);lsSet(LKEY,arr);
-      if(d.date===currentDate) refreshLocalDay();
+      if(rangeFrom&&d.date>=rangeFrom&&d.date<=rangeTo) refreshLocalRange();
       res();
     });
   }
@@ -766,7 +779,7 @@
     if(mode==="shared"){
       db.collection("entries").doc(id).delete().then(function(){toast("삭제됨");}).catch(function(){toast("삭제 권한이 없습니다");});
     }else{
-      var arr=(lsGet(LKEY)||[]).filter(function(e){return e.id!==id;});lsSet(LKEY,arr);refreshLocalDay();toast("삭제됨");
+      var arr=(lsGet(LKEY)||[]).filter(function(e){return e.id!==id;});lsSet(LKEY,arr);refreshLocalRange();toast("삭제됨");
     }
   };
   // confirm()은 아티팩트에서 동작하지 않으므로 즉시 삭제 대신 2단계 토스트
@@ -774,42 +787,50 @@
   function confirmLike(){return true;}
 
   // ---- 기록 조회 ----
-  window.onRecDate=function(){watchDay($("r-date").value);};
-  window.recDate=function(){$("r-date").value=todayStr();watchDay(todayStr());};
+  function shiftDate(s,delta){var p=s.split("-");var d=new Date(+p[0],(+p[1])-1,+p[2]);d.setDate(d.getDate()+delta);return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+  function clampRange(from,to){ if(!from)from=to; if(!to)to=from; if(from&&to&&from>to){var t=from;from=to;to=t;} return [from,to]; }
+  window.onRecRange=function(){ var r=clampRange($("r-from").value,$("r-to").value); if(!r[0]){rangeToday();return;} $("r-from").value=r[0];$("r-to").value=r[1]; watchRange(r[0],r[1]); };
+  window.rangeToday=function(){ var d=todayStr(); $("r-from").value=d;$("r-to").value=d; watchRange(d,d); };
+  window.rangeDays=function(n){ var to=todayStr(); var from=shiftDate(to,-(n-1)); $("r-from").value=from;$("r-to").value=to; watchRange(from,to); };
+  window.rangeMonth=function(){ var now=new Date(); var from=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-01"; var to=todayStr(); $("r-from").value=from;$("r-to").value=to; watchRange(from,to); };
 
-  function watchDay(dt){
-    currentDate=dt;
+  function watchRange(from,to){
+    rangeFrom=from; rangeTo=to;
     if(dayUnsub){dayUnsub();dayUnsub=null;}
-    if(mode==="shared"){
-      dayUnsub=db.collection("entries").where("date","==",dt).onSnapshot(function(snap){
+    if(mode==="shared"&&db){
+      dayUnsub=db.collection("entries").where("date",">=",from).where("date","<=",to).onSnapshot(function(snap){
         day=snap.docs.map(function(x){var o=Object.assign({},x.data()||{});o.id=x.id;return o;});
         sortDay();renderRecords();
-      },function(){ /* 일시 오류는 자동 복구 */ });
+      });
     }else{
-      refreshLocalDay();
+      refreshLocalRange();
     }
   }
-  function refreshLocalDay(){
-    day=(lsGet(LKEY)||[]).filter(function(e){return e.date===currentDate;});
+  function refreshLocalRange(){
+    day=(lsGet(LKEY)||[]).filter(function(e){return e.date>=rangeFrom && e.date<=rangeTo;});
     sortDay();renderRecords();
   }
-  function sortDay(){day.sort(function(a,b){return (a.time||"").localeCompare(b.time||"")|| (a.createdAt||0)-(b.createdAt||0);});}
+  function sortDay(){day.sort(function(a,b){return (b.date||"").localeCompare(a.date||"")||(b.time||"").localeCompare(a.time||"")||((b.createdAt||0)-(a.createdAt||0));});}
 
   function safetyInfo(e){
     var s=e.safety||{};var miss=SAFE.filter(function(k){return !s[k];});
     return {ok:miss.length===0, n:SAFE.length-miss.length, miss:miss};
   }
+  function shortDate(s){if(!s)return"";var p=s.split("-");return (+p[1])+"/"+(+p[2]);}
   function renderRecords(){
     var trips=day.length, people=day.reduce(function(a,e){return a+(e.count||0);},0);
     var up=day.filter(function(e){return e.direction==="상행";}).length;
     $("summary").innerHTML=
-      stat(trips,"운행 횟수")+stat(people,"연 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행");
+      stat(trips,"운행 횟수")+stat(people,"총 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행");
     var list=$("reclist");
-    if(!trips){list.innerHTML='<div class="empty">'+fmtDate(currentDate)+' 기록이 없습니다.</div>';return;}
+    var multiDay=(rangeFrom!==rangeTo);
+    var rangeLabel=multiDay?(fmtDate(rangeFrom)+" ~ "+fmtDate(rangeTo)):fmtDate(rangeFrom);
+    if(!trips){list.innerHTML='<div class="empty">'+esc(rangeLabel)+' 기록이 없습니다.</div>';return;}
     list.innerHTML=day.map(function(e){
       var dcl=e.direction==="상행"?"up":"down";
+      var when=(multiDay?shortDate(e.date)+" ":"")+esc(e.time||"");
       return '<div class="entry">'+
-        '<div class="r1"><span class="time">'+esc(e.time||"")+'</span>'+
+        '<div class="r1"><span class="time">'+when+'</span>'+
           '<span class="chip '+dcl+'">'+esc(e.direction||"")+'</span>'+
           '<span class="ppl">'+ (e.count||0) +'명</span></div>'+
         '<div class="r2"><span class="k">목적</span> '+esc(e.purpose||"-")+
@@ -1072,7 +1093,7 @@
   function start(){
     $("f-date").value=todayStr();
     $("f-time").value=nowTime();
-    $("r-date").value=todayStr();
+    $("r-from").value=todayStr(); $("r-to").value=todayStr();
     $("p-date").value=todayStr();
     var dr=lsGet(DRAFT);
     if(dr){$("f-operator").value=dr.operator||"";$("f-affil").value=dr.affiliation||"";$("p-applicant").value=dr.applicant||"";}
@@ -1082,7 +1103,7 @@
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchDay(currentDate); watchPermits(); watchStatus();
+    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus();
   }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
