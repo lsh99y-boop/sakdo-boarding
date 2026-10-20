@@ -181,6 +181,22 @@
   .stbtn.off{background:#c0462a}
   .stbtn:active{filter:brightness(.95)}
   #statusNote{text-align:left;letter-spacing:normal;font-size:14px}
+  /* 예비품 */
+  .partrow{display:flex;align-items:flex-start;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
+  .partrow:last-child{border-bottom:0}
+  .partrow .pinfo{flex:1;min-width:0}
+  .partrow .pname{font-weight:700;font-size:14.5px}
+  .partrow .pname .pqty{color:var(--accent);margin-left:6px;font-size:13px}
+  .partrow .pmeta{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.5}
+  .partrow .pacts{display:flex;gap:6px;flex:none}
+  .partrow .pacts button{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;font-size:12px;padding:5px 9px;cursor:pointer;color:var(--muted)}
+  .partrow .pacts .pdel{color:var(--warn)}
+  .partsempty{color:var(--muted);font-size:13px;padding:10px 2px}
+  .partbox{text-align:left;max-width:360px}
+  .partform label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin:8px 0 4px}
+  .partform input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--fg);font-size:15px;text-align:left;letter-spacing:normal}
+  .partform input:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  .parterr{color:var(--warn);font-size:12.5px;font-weight:600;margin-top:8px}
 
   /* 겉표지 */
   #cover{position:fixed;inset:0;z-index:100;background:linear-gradient(165deg,#2a8159,var(--accent) 40%,#0e3a26);color:#fff;display:flex;overflow:auto}
@@ -383,6 +399,14 @@
       </div>
     </div>
     <div class="card" id="reclist" style="margin-top:14px"></div>
+
+    <div class="card" id="partsCard" style="margin-top:14px">
+      <div class="checkhead">
+        <h2>예비품 현황</h2>
+        <button type="button" class="checkall" onclick="addPart()">＋ 추가</button>
+      </div>
+      <div id="partsList" style="padding:4px 15px 14px"></div>
+    </div>
   </section>
 
   <!-- 허가 -->
@@ -512,6 +536,29 @@
     </div>
     <div class="pinbtns">
       <button type="button" class="btn ghost sm" id="statusCancel">취소</button>
+    </div>
+  </div>
+</div>
+
+<div class="pinmodal" id="partModal" hidden>
+  <div class="pinbox partbox">
+    <div class="pintitle" id="partTitle">예비품 추가</div>
+    <div class="partform">
+      <label for="pt-name">품명 <span class="req">*</span></label>
+      <input type="text" id="pt-name" placeholder="예: 와이어로프 클립" autocomplete="off">
+      <label for="pt-spec">규격</label>
+      <input type="text" id="pt-spec" placeholder="예: 16mm / 모델명" autocomplete="off">
+      <label for="pt-qty">수량</label>
+      <input type="number" id="pt-qty" placeholder="0" min="0" inputmode="numeric">
+      <label for="pt-loc">위치</label>
+      <input type="text" id="pt-loc" placeholder="예: 송신소 창고 A-3" autocomplete="off">
+      <label for="pt-note">비고</label>
+      <input type="text" id="pt-note" placeholder="상태·특이사항 (선택)" autocomplete="off">
+      <div class="parterr" id="pt-err" hidden></div>
+    </div>
+    <div class="pinbtns">
+      <button type="button" class="btn ghost sm" id="partCancel">취소</button>
+      <button type="button" class="btn sm" id="partSave">저장</button>
     </div>
   </div>
 </div>
@@ -730,6 +777,75 @@
   if($("stOn")) $("stOn").addEventListener("click",function(){ setStatus("가능"); });
   if($("stOff")) $("stOff").addEventListener("click",function(){ setStatus("불가"); });
   if($("statusCancel")) $("statusCancel").addEventListener("click",closeStatusModal);
+
+  // ---- 예비품 현황 (config의 parts 행에 저장, 실시간) ----
+  var PARTSKEY="sakdo_parts_v1", partItems=[], partsUnsub=null, editPartId=null;
+  function renderParts(){
+    var box=$("partsList"); if(!box) return;
+    if(!partItems.length){ box.innerHTML='<div class="partsempty">등록된 예비품이 없습니다. "＋ 추가"로 등록하세요.</div>'; return; }
+    box.innerHTML=partItems.map(function(p){
+      var meta=[];
+      if(p.spec) meta.push("규격 "+esc(p.spec));
+      if(p.loc)  meta.push("위치 "+esc(p.loc));
+      if(p.note) meta.push(esc(p.note));
+      return '<div class="partrow"><div class="pinfo">'+
+        '<div class="pname">'+esc(p.name||"-")+'<span class="pqty">'+(p.qty!=null&&p.qty!==""?esc(p.qty)+"개":"")+'</span></div>'+
+        (meta.length?'<div class="pmeta">'+meta.join(" · ")+'</div>':"")+
+        '</div><div class="pacts">'+
+        '<button type="button" onclick="editPart(\''+p.id+'\')">수정</button>'+
+        '<button type="button" class="pdel" onclick="deletePart(\''+p.id+'\')">삭제</button>'+
+        '</div></div>';
+    }).join("");
+  }
+  function watchParts(){
+    if(mode==="shared"&&db){
+      partsUnsub=db.collection("config").onSnapshot(function(snap){
+        var row=snap.docs.filter(function(d){return d.id==="parts";})[0];
+        partItems=(row&&row.data()&&row.data().items)||[];
+        renderParts();
+      });
+    }else{ partItems=lsGet(PARTSKEY)||[]; renderParts(); }
+  }
+  function savePartItems(cb){
+    var obj={items:partItems, at:Date.now(), by:(lsGet(DRAFT)||{}).operator||""};
+    if(mode==="shared"&&db){
+      db.collection("config").doc("parts").set(obj).then(function(){cb&&cb();}).catch(function(){toast("저장 실패 — 편집 권한 필요");});
+    }else{ lsSet(PARTSKEY,partItems); renderParts(); cb&&cb(); }
+  }
+  function openPartModal(item){
+    editPartId=item?item.id:null;
+    $("partTitle").textContent=item?"예비품 수정":"예비품 추가";
+    $("pt-name").value=item?(item.name||""):"";
+    $("pt-spec").value=item?(item.spec||""):"";
+    $("pt-qty").value=item?(item.qty!=null?item.qty:""):"";
+    $("pt-loc").value=item?(item.loc||""):"";
+    $("pt-note").value=item?(item.note||""):"";
+    $("pt-err").hidden=true; $("partModal").hidden=false;
+    setTimeout(function(){$("pt-name").focus();},60);
+  }
+  function closePartModal(){$("partModal").hidden=true;editPartId=null;}
+  window.addPart=function(){ openPartModal(null); };
+  window.editPart=function(id){ var it=partItems.filter(function(x){return x.id===id;})[0]; if(it)openPartModal(it); };
+  window.deletePart=function(id){
+    var it=partItems.filter(function(x){return x.id===id;})[0];
+    if(!it) return;
+    if(!confirm("'"+(it.name||"")+"' 을(를) 삭제할까요?")) return;
+    partItems=partItems.filter(function(x){return x.id!==id;});
+    savePartItems(function(){toast("삭제됨");});
+  };
+  function savePart(){
+    var name=$("pt-name").value.trim();
+    if(!name){ $("pt-err").textContent="품명을 입력하세요"; $("pt-err").hidden=false; $("pt-name").focus(); return; }
+    var data={ name:name, spec:$("pt-spec").value.trim(), qty:$("pt-qty").value.trim(), loc:$("pt-loc").value.trim(), note:$("pt-note").value.trim() };
+    if(editPartId){
+      partItems=partItems.map(function(x){ return x.id===editPartId?Object.assign({},x,data):x; });
+    }else{
+      data.id=genId(); partItems=partItems.concat([data]);
+    }
+    savePartItems(function(){ closePartModal(); toast("저장되었습니다"); });
+  }
+  if($("partSave")) $("partSave").addEventListener("click",savePart);
+  if($("partCancel")) $("partCancel").addEventListener("click",closePartModal);
 
   // ---- 폼 보조 ----
   window.setDir=function(d){dir=d;
@@ -1142,7 +1258,7 @@
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus();
+    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts();
   }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
