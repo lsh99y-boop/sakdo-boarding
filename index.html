@@ -69,13 +69,13 @@
   .field input,.field select{min-width:0}
   /* 탑승예정일·예정인원은 항상 한 줄에. minmax(0,…)+overflow로 날짜칸이 자기 칸을 넘지 못하게(iOS 대응) */
   .pair{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:16px;align-items:stretch}
-  .pair-eq{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}  /* 운행일자·운행시각 반반 */
   .pair .field{min-width:0}
+  #f-date,#f-time{text-align:left}  /* 값이 가운데 떠서 커 보이지 않도록 왼쪽 정렬 */
   .pair .field input{flex:1 1 auto}  /* 날짜·인원 박스 높이 동일하게 */
   .pair #p-date{width:100%;max-width:100%}
   .pair #p-count{text-align:center}
   /* iOS 날짜 입력칸은 잘 안 줄어들어 넘치므로 폰에서는 글자·여백을 줄여 칸 안에 확실히 들어오게 */
-  @media (max-width:500px){ #p-date,#f-date,#f-time{font-size:14px;padding-left:9px;padding-right:4px} }
+  @media (max-width:500px){ #p-date{font-size:14px;padding-left:9px;padding-right:4px} }
   .field{display:flex;flex-direction:column;gap:6px;min-width:0}
   .field.full{grid-column:1 / -1}
   .field label{font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -277,15 +277,13 @@
             </select>
             <span class="hint">승인된 허가를 선택하면 기관·인원·목적이 자동 입력됩니다.</span>
           </div>
-          <div class="pair pair-eq">
-            <div class="field">
-              <label for="f-date">운행일자 <span class="req">*</span></label>
-              <input type="date" id="f-date" required>
-            </div>
-            <div class="field">
-              <label for="f-time">운행시각 <span class="req">*</span></label>
-              <input type="time" id="f-time" required>
-            </div>
+          <div class="field">
+            <label for="f-date">운행일자 <span class="req">*</span></label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="field">
+            <label for="f-time">운행시각 <span class="req">*</span></label>
+            <input type="time" id="f-time" required>
           </div>
           <div class="field full">
             <label>운행구분 <span class="req">*</span></label>
