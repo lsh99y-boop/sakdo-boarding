@@ -1,0 +1,17 @@
+{
+  "name": "계룡산(송) 삭도 탑승·운행 기록",
+  "short_name": "삭도 기록",
+  "description": "계룡산송신소 삭도 탑승·운행 기록 및 사전 탑승 허가 신청",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#13643b",
+  "theme_color": "#1f6b47",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

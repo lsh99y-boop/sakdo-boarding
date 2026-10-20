@@ -9,6 +9,13 @@
 <meta property="og:description" content="계룡산송신소 삭도 탑승·운행 기록 / 사전 탑승 허가 신청">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#1f6b47">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="삭도 기록">
 <style>
   /* 레이아웃: 상단 고정 헤더 + 탭(작성·기록·QR) 세로 스크롤, 모바일 1열 폼 */
   :root{
@@ -74,6 +81,7 @@
   .pair .field input{flex:1 1 auto}  /* 날짜·인원 박스 높이 동일하게 */
   .pair #p-date{width:100%;max-width:100%}
   .pair #p-count{text-align:center}
+  .feebox{background:var(--accent-soft);color:var(--accent);border:1px solid var(--line);border-radius:10px;padding:12px 13px;font-weight:800;font-size:17px}
   /* iOS 날짜 입력칸은 잘 안 줄어들어 넘치므로 폰에서는 글자·여백을 줄여 칸 안에 확실히 들어오게 */
   @media (max-width:500px){ #p-date{font-size:14px;padding-left:9px;padding-right:4px} }
   .field{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -386,12 +394,17 @@
           <div class="pair">
             <div class="field">
               <label for="p-date">탑승 예정일 <span class="req">*</span></label>
-              <input type="date" id="p-date" required>
+              <input type="date" id="p-date" required onchange="updateFee()">
             </div>
             <div class="field">
               <label for="p-count">예정 인원 <span class="req">*</span></label>
               <input type="number" id="p-count" min="1" max="50" value="1" inputmode="numeric">
             </div>
+          </div>
+          <div class="field full">
+            <label>탑승비용 (1일 기준)</label>
+            <div class="feebox" id="p-feebox">탑승 예정일을 선택하세요</div>
+            <span class="hint" id="p-feenote"></span>
           </div>
           <div class="field full">
             <label for="p-org">신청 기관 / 부대 <span class="req">*</span></label>
@@ -604,7 +617,7 @@
       $("tab-"+k).setAttribute("aria-selected", k===n?"true":"false");
     });
     if(n==="qr") renderQR();
-    if(n==="permit") renderPermits();
+    if(n==="permit"){ renderPermits(); updateFee(); }
     if(n==="write") fillPermitSelect();
     setHeader(n);
   };
@@ -913,6 +926,17 @@
   // ---- 사전 허가 ----
   function savedWriter(){var d=lsGet(DRAFT)||{};return d.writer||d.applicant||"";}
 
+  // 탑승비용: 2027-01-01 이후 45,000원/일, 이전 33,000원/일
+  function feeForDate(d){ return (d && d>="2027-01-01") ? 45000 : 33000; }
+  function won(n){ return (n||0).toLocaleString("ko-KR")+"원"; }
+  window.updateFee=function(){
+    var box=$("p-feebox"); if(!box) return;
+    var d=$("p-date").value, note=$("p-feenote");
+    if(!d){ box.textContent="탑승 예정일을 선택하세요"; if(note)note.textContent=""; return; }
+    box.textContent=won(feeForDate(d))+" / 1일";
+    if(note) note.textContent=(d>="2027-01-01")?"2027년 1월 인상 요금 적용":"현재 요금 (2027-01-01부터 45,000원으로 인상 예정)";
+  };
+
   // 탑승자 명단: 이름 추가/삭제
   var riderNames=[];
   function renderRiderChips(){
@@ -946,6 +970,7 @@
     var p={status:"대기", visitDate:vdate, count:parseInt($("p-count").value||"1",10)||1,
       org:org, contactName:name, contactPhone:$("p-phone").value.trim(), purpose:purpose,
       riders:riderNames.join(", "), vehicle:$("p-vehicle").value.trim(), cargoKg:$("p-cargokg").value.trim(), note:$("p-note").value.trim(),
+      fee:feeForDate(vdate),
       applicant:applicant, decidedBy:"", decidedAt:0, createdAt:Date.now()};
     lsSet(DRAFT, Object.assign(lsGet(DRAFT)||{}, {applicant:applicant}));
     var btn=$("pSaveBtn");btn.disabled=true;btn.textContent="등록 중…";
@@ -953,7 +978,7 @@
       btn.disabled=false;btn.textContent="탑승 신청";
       toast("탑승 신청이 등록되었습니다 (대기)");
       $("pform").reset();$("p-date").value=todayStr();$("p-count").value=1;$("p-applicant").value=applicant;
-      riderNames=[];renderRiderChips();
+      riderNames=[];renderRiderChips();updateFee();
       $("p-filter").value="대기";renderPermits();
     }).catch(function(err){
       btn.disabled=false;btn.textContent="탑승 신청";
@@ -1029,6 +1054,7 @@
         (p.riders?'<div class="r2"><span class="k">탑승자</span> '+esc(p.riders)+'</div>':"")+
         (p.vehicle?'<div class="r2"><span class="k">차량/장비</span> '+esc(p.vehicle)+'</div>':"")+
         (p.cargoKg?'<div class="r2"><span class="k">반입화물</span> '+esc(p.cargoKg)+' kg</div>':"")+
+        '<div class="r2"><span class="k">탑승비용</span> '+won(p.fee||feeForDate(p.visitDate))+' / 1일</div>'+
         (p.note?'<div class="r2"><span class="k">비고</span> '+esc(p.note)+'</div>':"")+
         '<div class="contact">인솔자 '+esc(p.contactName||"-")+(p.contactPhone?" · "+esc(p.contactPhone):"")+' · 신청자 '+esc(p.applicant||"-")+'</div>'+
         dec+actions+
@@ -1063,8 +1089,8 @@
     saveFile("삭도탑승허가_목록.csv", permitsCSV(permits), "text/csv");
   };
   function permitsCSV(rows){
-    var prepared=rows.map(function(e){var r=Object.assign({},e);r.decidedText=e.decidedAt?new Date(e.decidedAt).toLocaleString("ko-KR"):"";return r;});
-    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["note","비고"],["applicant","신청자"],["decidedBy","처리자"],["decidedText","처리일시"]];
+    var prepared=rows.map(function(e){var r=Object.assign({},e);r.decidedText=e.decidedAt?new Date(e.decidedAt).toLocaleString("ko-KR"):"";r.feeVal=(e.fee||feeForDate(e.visitDate));return r;});
+    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["feeVal","탑승비용(원/일)"],["note","비고"],["applicant","신청자"],["decidedBy","처리자"],["decidedText","처리일시"]];
     return buildCSV(prepared,cols,"riders");
   }
 
@@ -1121,6 +1147,14 @@
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
 })();
+</script>
+<script>
+  /* PWA 서비스워커 등록(설치·오프라인 셸) */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
 </script>
 </body>
 </html>
