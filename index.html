@@ -154,6 +154,12 @@
   .pinerr{color:var(--warn);font-size:12.5px;font-weight:600;margin-bottom:10px}
   .pinbtns{display:flex;gap:9px;margin-top:4px}
   .pinbtns .btn{flex:1;width:auto}
+  .statusbtns{display:flex;gap:9px;margin:2px 0 10px}
+  .stbtn{flex:1;border:0;border-radius:12px;padding:16px 10px;font-size:16px;font-weight:800;color:#fff;cursor:pointer}
+  .stbtn.on{background:#1f8a53}
+  .stbtn.off{background:#c0462a}
+  .stbtn:active{filter:brightness(.95)}
+  #statusNote{text-align:left;letter-spacing:normal;font-size:14px}
 
   /* 겉표지 */
   #cover{position:fixed;inset:0;z-index:100;background:linear-gradient(165deg,#2a8159,var(--accent) 40%,#0e3a26);color:#fff;display:flex;overflow:auto}
@@ -166,6 +172,12 @@
   #cover .mark .w{font-size:68px}
   #cover .ttl{font-size:17px;font-weight:600;opacity:.95;margin-top:-4px}
   #cover .hr{height:1px;background:rgba(255,255,255,.25)}
+  .opstatus{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;cursor:pointer;border-radius:14px;padding:13px 16px;font-family:inherit;font-weight:800;font-size:19px;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .opstatus .ops-sub{font-size:12px;font-weight:600;opacity:.92}
+  .opstatus.on{background:linear-gradient(135deg,#1f8a53,#13643b)}
+  .opstatus.off{background:linear-gradient(135deg,#c0462a,#8a2d19)}
+  .opstatus.unknown{background:rgba(255,255,255,.16);font-size:15px;font-weight:700}
+  .opstatus:active{filter:brightness(.95)}
   .enter{appearance:none;border:0;cursor:pointer;border-radius:16px;font-family:inherit;color:#fff}
   .enter.primary{position:relative;background:#fff;color:var(--accent);padding:19px 20px;box-shadow:0 12px 34px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;gap:14px}
   .enter.primary .pic{font-size:30px}
@@ -206,6 +218,9 @@
   <div class="cwrap">
     <div class="site">KBS대전방송총국 · 계룡산송신소</div>
     <div class="mark"><span class="ic">🚠</span><span class="w">삭도</span></div>
+    <button type="button" class="opstatus unknown" id="coverStatus" onclick="openStatusChange()">
+      <span class="ops-main">운행 상태 확인 중…</span>
+    </button>
     <div class="hr"></div>
     <button class="enter primary" onclick="enterApp('permit')">
       <span class="pic">🚠</span>
@@ -303,13 +318,9 @@
 
       <div class="card">
         <div class="grid">
-          <div class="field">
+          <div class="field full">
             <label for="f-operator">운전(조작)자 <span class="req">*</span></label>
             <input type="text" id="f-operator" placeholder="조작 담당자">
-          </div>
-          <div class="field">
-            <label for="f-writer">작성자 <span class="req">*</span></label>
-            <input type="text" id="f-writer" placeholder="본인 성명">
           </div>
           <div class="field full">
             <label for="f-notes">특이사항</label>
@@ -448,6 +459,22 @@
     <div class="pinbtns">
       <button type="button" class="btn ghost sm" id="pinCancel">취소</button>
       <button type="button" class="btn sm" id="pinOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="pinmodal" id="statusModal" hidden>
+  <div class="pinbox">
+    <div class="pinlock">🚠</div>
+    <div class="pintitle">운행 상태 변경</div>
+    <div class="pindesc">현재 삭도 운행 가능 여부를 선택하세요. 표지에 즉시 표시됩니다.</div>
+    <input type="text" id="statusNote" maxlength="40" placeholder="사유·안내 (선택) 예: 점검 중, 기상 악화" autocomplete="off">
+    <div class="statusbtns">
+      <button type="button" class="stbtn on" id="stOn">🟢 운행 가능</button>
+      <button type="button" class="stbtn off" id="stOff">🔴 운행 불가</button>
+    </div>
+    <div class="pinbtns">
+      <button type="button" class="btn ghost sm" id="statusCancel">취소</button>
     </div>
   </div>
 </div>
@@ -615,6 +642,42 @@
     var el=$(id);if(el)el.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submitPin();}});
   });
 
+  // ---- 운행 가능/불가 상태 ----
+  var SKEY="sakdo_status_v1", curStatus=null, statusUnsub=null;
+  function renderStatus(st){
+    var el=$("coverStatus"); if(!el) return;
+    var cls, main, sub="";
+    if(!st || !st.state){ cls="unknown"; main="⚪ 운행 상태 미설정 (눌러서 설정)"; }
+    else if(st.state==="가능"){ cls="on"; main="🟢 현재 운행 가능"; }
+    else { cls="off"; main="🔴 현재 운행 불가"; }
+    if(st && st.note) sub=st.note;
+    if(st && st.at){ var t=new Date(st.at); sub=(sub?sub+" · ":"")+(t.getMonth()+1)+"/"+t.getDate()+" "+pad(t.getHours())+":"+pad(t.getMinutes())+" 갱신"; }
+    el.className="opstatus "+cls;
+    el.innerHTML='<span class="ops-main">'+esc(main)+'</span>'+(sub?'<span class="ops-sub">'+esc(sub)+'</span>':"");
+  }
+  function watchStatus(){
+    if(mode==="shared" && db){
+      statusUnsub=db.collection("config").onSnapshot(function(snap){
+        var row=snap.docs.filter(function(d){return d.id==="status";})[0];
+        curStatus=row?row.data():null; renderStatus(curStatus);
+      });
+    } else { curStatus=lsGet(SKEY)||null; renderStatus(curStatus); }
+  }
+  function setStatus(state){
+    var note=(($("statusNote")||{}).value||"").trim();
+    var obj={state:state, note:note, by:(lsGet(DRAFT)||{}).operator||"", at:Date.now()};
+    if(mode==="shared" && db){
+      db.collection("config").doc("status").set(obj).then(function(){ toast("운행 상태 저장: "+state); }).catch(function(){ toast("상태 저장 실패 — 편집 권한 필요"); });
+    } else { lsSet(SKEY,obj); curStatus=obj; renderStatus(obj); toast("운행 상태 저장: "+state); }
+    closeStatusModal();
+  }
+  function openStatusModal(){ if($("statusNote"))$("statusNote").value=(curStatus&&curStatus.note)||""; $("statusModal").hidden=false; }
+  function closeStatusModal(){ $("statusModal").hidden=true; }
+  window.openStatusChange=function(){ requireUnlock(openStatusModal); };
+  if($("stOn")) $("stOn").addEventListener("click",function(){ setStatus("가능"); });
+  if($("stOff")) $("stOff").addEventListener("click",function(){ setStatus("불가"); });
+  if($("statusCancel")) $("statusCancel").addEventListener("click",closeStatusModal);
+
   // ---- 폼 보조 ----
   window.setDir=function(d){dir=d;
     document.querySelectorAll("#dir button").forEach(function(b){b.setAttribute("aria-pressed", b.dataset.d===d?"true":"false");});
@@ -637,7 +700,6 @@
       affiliation:$("f-affil").value.trim(),
       cargo:$("f-cargo").value.trim(),
       operator:$("f-operator").value.trim(),
-      writer:$("f-writer").value.trim(),
       notes:$("f-notes").value.trim(),
       permitId: $("f-permit")?$("f-permit").value:"",
       permitOrg: ($("f-permit")&&$("f-permit").value)?($("f-permit").selectedOptions[0]?$("f-permit").selectedOptions[0].text:""):"",
@@ -650,8 +712,7 @@
     var d=collect();
     if(!d.date||!d.time){toast("일자·시각을 확인하세요");return;}
     if(!d.operator){toast("운전(조작)자를 입력하세요");$("f-operator").focus();return;}
-    if(!d.writer){toast("작성자를 입력하세요");$("f-writer").focus();return;}
-    lsSet(DRAFT,{operator:d.operator,writer:d.writer,affiliation:d.affiliation});
+    lsSet(DRAFT,{operator:d.operator,affiliation:d.affiliation});
     var btn=$("saveBtn");btn.disabled=true;btn.textContent="저장 중…";
     addEntry(d).then(function(){
       btn.disabled=false;btn.textContent="탑승 기록 저장";
@@ -674,7 +735,7 @@
     $("f-riders").value="";$("f-cargo").value="";$("f-notes").value="";
     document.querySelectorAll("#checks input").forEach(function(b){b.checked=false;});
     if($("f-permit"))$("f-permit").value="";
-    // 일자·운전자·작성자·소속은 유지(연속 작성 편의)
+    // 일자·운전자·소속은 유지(연속 작성 편의)
   }
 
   function addEntry(d){
@@ -744,7 +805,7 @@
         (e.notes?'<div class="r2"><span class="k">특이</span> '+esc(e.notes)+'</div>':"")+
         '<div class="meta">'+
           '<span>운전 '+esc(e.operator||"-")+'</span>'+
-          '<span>작성 '+esc(e.writer||"-")+(e.affiliation?" ("+esc(e.affiliation)+")":"")+'</span>'+
+          (e.affiliation?'<span>소속 '+esc(e.affiliation)+'</span>':"")+
         '</div>'+
         '<button class="del" onclick="deleteEntry(\''+e.id+'\')">삭제</button>'+
       '</div>';
@@ -774,7 +835,7 @@
   }
   function toCSV(rows){
     var prepared=rows.map(function(e){var r=Object.assign({},e);r.createdText=e.createdAt?new Date(e.createdAt).toLocaleString("ko-KR"):"";return r;});
-    var cols=[["date","운행일자"],["time","운행시각"],["direction","구분"],["count","인원"],["purpose","운행목적"],["affiliation","소속"],["cargo","운반물/중량"],["operator","운전(조작)자"],["notes","특이사항"],["writer","작성자"],["createdText","작성시각"]];
+    var cols=[["date","운행일자"],["time","운행시각"],["direction","구분"],["count","인원"],["purpose","운행목적"],["affiliation","소속"],["cargo","운반물/중량"],["operator","운전(조작)자"],["notes","특이사항"],["createdText","작성시각"]];
     return buildCSV(prepared,cols,"riders");
   }
   function saveFile(name,data,type){
@@ -1001,14 +1062,14 @@
     $("r-date").value=todayStr();
     $("p-date").value=todayStr();
     var dr=lsGet(DRAFT);
-    if(dr){$("f-operator").value=dr.operator||"";$("f-writer").value=dr.writer||"";$("f-affil").value=dr.affiliation||"";$("p-applicant").value=dr.applicant||dr.writer||"";}
+    if(dr){$("f-operator").value=dr.operator||"";$("f-affil").value=dr.affiliation||"";$("p-applicant").value=dr.applicant||"";}
 
     if(sb){
       db=makeSupabaseDB(sb); downloads=null; mode="shared";
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchDay(currentDate); watchPermits();
+    reflectMode(); loadPin(); watchDay(currentDate); watchPermits(); watchStatus();
   }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
