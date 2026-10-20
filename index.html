@@ -402,7 +402,7 @@
             </div>
           </div>
           <div class="field full">
-            <label>탑승비용 (1일 기준)</label>
+            <label>탑승비용 (왕복 1회)</label>
             <div class="feebox" id="p-feebox">탑승 예정일을 선택하세요</div>
             <span class="hint" id="p-feenote"></span>
           </div>
@@ -933,7 +933,7 @@
     var box=$("p-feebox"); if(!box) return;
     var d=$("p-date").value, note=$("p-feenote");
     if(!d){ box.textContent="탑승 예정일을 선택하세요"; if(note)note.textContent=""; return; }
-    box.textContent=won(feeForDate(d))+" / 1일";
+    box.textContent=won(feeForDate(d))+" / 왕복 1회";
     if(note) note.textContent=(d>="2027-01-01")?"2027년 1월 인상 요금 적용":"현재 요금 (2027-01-01부터 45,000원으로 인상 예정)";
   };
 
@@ -1054,7 +1054,7 @@
         (p.riders?'<div class="r2"><span class="k">탑승자</span> '+esc(p.riders)+'</div>':"")+
         (p.vehicle?'<div class="r2"><span class="k">차량/장비</span> '+esc(p.vehicle)+'</div>':"")+
         (p.cargoKg?'<div class="r2"><span class="k">반입화물</span> '+esc(p.cargoKg)+' kg</div>':"")+
-        '<div class="r2"><span class="k">탑승비용</span> '+won(p.fee||feeForDate(p.visitDate))+' / 1일</div>'+
+        '<div class="r2"><span class="k">탑승비용</span> '+won(p.fee||feeForDate(p.visitDate))+' / 왕복 1회</div>'+
         (p.note?'<div class="r2"><span class="k">비고</span> '+esc(p.note)+'</div>':"")+
         '<div class="contact">인솔자 '+esc(p.contactName||"-")+(p.contactPhone?" · "+esc(p.contactPhone):"")+' · 신청자 '+esc(p.applicant||"-")+'</div>'+
         dec+actions+
@@ -1090,7 +1090,7 @@
   };
   function permitsCSV(rows){
     var prepared=rows.map(function(e){var r=Object.assign({},e);r.decidedText=e.decidedAt?new Date(e.decidedAt).toLocaleString("ko-KR"):"";r.feeVal=(e.fee||feeForDate(e.visitDate));return r;});
-    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["feeVal","탑승비용(원/일)"],["note","비고"],["applicant","신청자"],["decidedBy","처리자"],["decidedText","처리일시"]];
+    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["feeVal","탑승비용(원/왕복)"],["note","비고"],["applicant","신청자"],["decidedBy","처리자"],["decidedText","처리일시"]];
     return buildCSV(prepared,cols,"riders");
   }
 
