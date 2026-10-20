@@ -384,8 +384,8 @@
             <input type="text" id="p-note" placeholder="특이사항 (선택)">
           </div>
           <div class="field">
-            <label for="p-applicant">신청 접수자 <span class="req">*</span></label>
-            <input type="text" id="p-applicant" placeholder="접수한 직원 성명">
+            <label for="p-applicant">신청자 <span class="req">*</span></label>
+            <input type="text" id="p-applicant" placeholder="신청자 성명">
           </div>
         </div>
         <div style="padding:0 15px 16px">
@@ -822,7 +822,7 @@
     if(!org){toast("신청 기관/부대를 입력하세요");$("p-org").focus();return;}
     if(!name){toast("담당자 성명을 입력하세요");$("p-name").focus();return;}
     if(!purpose){toast("방문 목적을 입력하세요");$("p-purpose").focus();return;}
-    if(!applicant){toast("신청 접수자를 입력하세요");$("p-applicant").focus();return;}
+    if(!applicant){toast("신청자를 입력하세요");$("p-applicant").focus();return;}
     var p={status:"대기", visitDate:vdate, count:parseInt($("p-count").value||"1",10)||1,
       org:org, contactName:name, contactPhone:$("p-phone").value.trim(), purpose:purpose,
       riders:riderNames.join(", "), vehicle:$("p-vehicle").value.trim(), cargoKg:$("p-cargokg").value.trim(), note:$("p-note").value.trim(),
@@ -910,7 +910,7 @@
         (p.vehicle?'<div class="r2"><span class="k">차량/장비</span> '+esc(p.vehicle)+'</div>':"")+
         (p.cargoKg?'<div class="r2"><span class="k">반입화물</span> '+esc(p.cargoKg)+' kg</div>':"")+
         (p.note?'<div class="r2"><span class="k">비고</span> '+esc(p.note)+'</div>':"")+
-        '<div class="contact">인솔자 '+esc(p.contactName||"-")+(p.contactPhone?" · "+esc(p.contactPhone):"")+' · 접수 '+esc(p.applicant||"-")+'</div>'+
+        '<div class="contact">인솔자 '+esc(p.contactName||"-")+(p.contactPhone?" · "+esc(p.contactPhone):"")+' · 신청자 '+esc(p.applicant||"-")+'</div>'+
         dec+actions+
       '</div>';
     }).join("");
@@ -945,7 +945,7 @@
   };
   function permitsCSV(rows){
     var prepared=rows.map(function(e){var r=Object.assign({},e);r.decidedText=e.decidedAt?new Date(e.decidedAt).toLocaleString("ko-KR"):"";return r;});
-    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["note","비고"],["applicant","접수자"],["decidedBy","처리자"],["decidedText","처리일시"]];
+    var cols=[["visitDate","탑승예정일"],["status","상태"],["org","신청기관/부대"],["count","예정인원"],["contactName","인솔자"],["contactPhone","연락처"],["purpose","목적"],["vehicle","차량/장비"],["cargoKg","반입화물(kg)"],["note","비고"],["applicant","신청자"],["decidedBy","처리자"],["decidedText","처리일시"]];
     return buildCSV(prepared,cols,"riders");
   }
 
