@@ -665,6 +665,7 @@
   }
   function setStatus(state){
     var note=(($("statusNote")||{}).value||"").trim();
+    if(state==="가능") note="";   // 운행 가능 시 사유 리셋(필요 없음)
     var obj={state:state, note:note, by:(lsGet(DRAFT)||{}).operator||"", at:Date.now()};
     if(mode==="shared" && db){
       db.collection("config").doc("status").set(obj).then(function(){ toast("운행 상태 저장: "+state); }).catch(function(){ toast("상태 저장 실패 — 편집 권한 필요"); });
