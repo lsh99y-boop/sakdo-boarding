@@ -67,6 +67,9 @@
   /* 좁은 폰에서는 날짜/시각 등 입력칸이 안 줄어들어 2열이 겹치므로 1열로 */
   @media (max-width:500px){ form .grid{grid-template-columns:1fr} }
   .field input,.field select{min-width:0}
+  /* 탑승예정일(넓게)·예정인원(좁게)은 항상 한 줄에 */
+  .pair{grid-column:1 / -1;display:grid;grid-template-columns:1.7fr 1fr;gap:12px}
+  .pair .field{min-width:0}
   .field{display:flex;flex-direction:column;gap:6px;min-width:0}
   .field.full{grid-column:1 / -1}
   .field label{font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -374,13 +377,15 @@
       <h2>사전 탑승 허가 신청</h2>
       <form id="pform" autocomplete="off">
         <div class="grid">
-          <div class="field">
-            <label for="p-date">탑승 예정일 <span class="req">*</span></label>
-            <input type="date" id="p-date" required>
-          </div>
-          <div class="field">
-            <label for="p-count">예정 인원 <span class="req">*</span></label>
-            <input type="number" id="p-count" min="1" max="50" value="1" inputmode="numeric">
+          <div class="pair">
+            <div class="field">
+              <label for="p-date">탑승 예정일 <span class="req">*</span></label>
+              <input type="date" id="p-date" required>
+            </div>
+            <div class="field">
+              <label for="p-count">예정 인원 <span class="req">*</span></label>
+              <input type="number" id="p-count" min="1" max="50" value="1" inputmode="numeric">
+            </div>
           </div>
           <div class="field full">
             <label for="p-org">신청 기관 / 부대 <span class="req">*</span></label>
