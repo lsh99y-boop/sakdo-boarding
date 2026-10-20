@@ -69,7 +69,7 @@
   .field input,.field select{min-width:0}
   /* 탑승예정일·예정인원은 항상 한 줄에. minmax(0,…)+overflow로 날짜칸이 자기 칸을 넘지 못하게(iOS 대응) */
   .pair{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) 88px;gap:10px;align-items:end}
-  .pair .field{min-width:0;overflow:hidden;border-radius:10px}
+  .pair .field{min-width:0}
   .pair #p-date{width:100%;max-width:100%}
   .pair #p-count{text-align:center}
   /* iOS 날짜 입력칸은 잘 안 줄어들어 넘치므로 폰에서는 글자·여백을 줄여 칸 안에 확실히 들어오게 */
