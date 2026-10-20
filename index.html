@@ -64,6 +64,9 @@
   .card h2{font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.04em;padding:13px 15px 0}
 
   form .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:12px 15px 15px}
+  /* 좁은 폰에서는 날짜/시각 등 입력칸이 안 줄어들어 2열이 겹치므로 1열로 */
+  @media (max-width:500px){ form .grid{grid-template-columns:1fr} }
+  .field input,.field select{min-width:0}
   .field{display:flex;flex-direction:column;gap:6px;min-width:0}
   .field.full{grid-column:1 / -1}
   .field label{font-size:12.5px;font-weight:600;color:var(--muted)}
