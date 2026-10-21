@@ -272,7 +272,7 @@
     <div class="cmenu cmenu3">
       <button class="enter mini" onclick="enterApp('rec')"><span class="mi">📋</span>운행기록조회</button>
       <button class="enter mini" onclick="enterApp('parts')"><span class="mi">🧰</span>예비품</button>
-      <button class="enter mini" onclick="enterApp('qr')"><span class="mi">🔗</span>QR·공유</button>
+      <button class="enter mini" onclick="enterApp('qr')"><span class="mi">⚙️</span>설정</button>
     </div>
   </div>
 </section>
@@ -395,9 +395,6 @@
       <div class="summary" id="summary"></div>
       <div class="exports">
         <button type="button" class="btn ghost sm" onclick="exportAll()">🗂 전체 다운로드</button>
-        <button type="button" class="btn ghost sm" onclick="changePin()">🔑 열람 PIN</button>
-        <button type="button" class="btn ghost sm" onclick="changeDriverPin()">🚠 운전자 PIN</button>
-        <button type="button" class="btn ghost sm" onclick="lockApp()">🔒 잠금</button>
       </div>
     </div>
     <div class="card" id="reclist" style="margin-top:14px"></div>
@@ -510,6 +507,15 @@
         <div id="qrbox"><div class="empty" id="qrempty">게시 후 QR이 생성됩니다.</div></div>
         <div class="url" id="qrurl"></div>
         <button type="button" class="btn ghost sm" id="qrdl" onclick="downloadQR()" hidden>🖼 QR 이미지 내려받기</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="checkhead"><h2>관리</h2></div>
+      <div class="exports" style="padding:4px 15px 15px">
+        <button type="button" class="btn ghost sm" onclick="mgrChangePin()">🔑 열람 PIN 변경</button>
+        <button type="button" class="btn ghost sm" onclick="mgrChangeDriverPin()">🚠 운전자 PIN 변경</button>
+        <button type="button" class="btn ghost sm" onclick="lockApp()">🔒 잠금</button>
       </div>
     </div>
   </section>
@@ -678,7 +684,7 @@
     setHeader(n);
   };
   function setHeader(n){
-    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유",parts:"예비품 현황"};
+    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"설정",parts:"예비품 현황"};
     var h=document.querySelector("header.top h1");
     if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
   }
@@ -744,6 +750,9 @@
   }
   window.changePin=function(){ openPinModal(GATES.view, function(){toast("열람 PIN이 변경되었습니다");}, true); };
   window.changeDriverPin=function(){ openPinModal(GATES.driver, function(){toast("운전자 PIN이 변경되었습니다");}, true); };
+  // 설정 탭은 공개라, PIN 변경은 먼저 열람 PIN을 확인한 뒤 진행(아무나 못 바꾸게)
+  window.mgrChangePin=function(){ requireUnlock("view", function(){ changePin(); }); };
+  window.mgrChangeDriverPin=function(){ requireUnlock("view", function(){ changeDriverPin(); }); };
   if($("pinOk"))$("pinOk").addEventListener("click",submitPin);
   if($("pinCancel"))$("pinCancel").addEventListener("click",closePinModal);
   ["pinInput","pinInput2"].forEach(function(id){
