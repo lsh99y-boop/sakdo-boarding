@@ -224,6 +224,7 @@
   .enter.primary.sec small{opacity:.78}
   .enter.primary.sec:active{background:rgba(255,255,255,.26)}
   .cmenu{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cmenu.cmenu3{grid-template-columns:1fr 1fr 1fr}
   .enter.mini{background:rgba(255,255,255,.15);padding:15px 8px;font-size:13px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:7px}
   .enter.mini .mi{font-size:21px}
   .enter.mini:active{background:rgba(255,255,255,.28)}
@@ -268,8 +269,9 @@
       <span class="pic">✍️</span>
       <span class="ptxt">탑승자 기록<small>운행·탑승자 기록 작성</small></span>
     </button>
-    <div class="cmenu">
+    <div class="cmenu cmenu3">
       <button class="enter mini" onclick="enterApp('rec')"><span class="mi">📋</span>기록 조회</button>
+      <button class="enter mini" onclick="enterApp('parts')"><span class="mi">🧰</span>예비품</button>
       <button class="enter mini" onclick="enterApp('qr')"><span class="mi">🔗</span>QR·공유</button>
     </div>
   </div>
@@ -399,8 +401,11 @@
       </div>
     </div>
     <div class="card" id="reclist" style="margin-top:14px"></div>
+  </section>
 
-    <div class="card" id="partsCard" style="margin-top:14px">
+  <!-- 예비품 -->
+  <section class="panel" id="panel-parts" hidden>
+    <div class="card" id="partsCard">
       <div class="checkhead">
         <h2>예비품 현황</h2>
         <button type="button" class="checkall" onclick="addPart()">＋ 추가</button>
@@ -659,24 +664,25 @@
 
   // ---- 탭 ----
   window.showTab=function(n){
-    ["write","rec","permit","qr"].forEach(function(k){
-      $("panel-"+k).hidden=(k!==n);
-      $("tab-"+k).setAttribute("aria-selected", k===n?"true":"false");
+    ["write","rec","permit","qr","parts"].forEach(function(k){
+      var pn=$("panel-"+k); if(pn) pn.hidden=(k!==n);
+      var tb=$("tab-"+k); if(tb) tb.setAttribute("aria-selected", k===n?"true":"false");
     });
     if(n==="qr") renderQR();
     if(n==="permit"){ renderPermits(); updateFee(); }
     if(n==="write") fillPermitSelect();
+    if(n==="parts") renderParts();
     setHeader(n);
   };
   function setHeader(n){
-    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유"};
+    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"QR·공유",parts:"예비품 현황"};
     var h=document.querySelector("header.top h1");
     if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
   }
   function openTab(tab){$("cover").hidden=true;showTab(tab);try{window.scrollTo(0,0);}catch(e){}}
   window.enterApp=function(tab){
     tab=tab||"write";
-    if(tab==="rec"){ requireUnlock("view",function(){openTab(tab);}); return; }
+    if(tab==="rec"||tab==="parts"){ requireUnlock("view",function(){openTab(tab);}); return; }
     openTab(tab);
   };
   window.goCover=function(){$("cover").hidden=false;try{window.scrollTo(0,0);}catch(e){}};
