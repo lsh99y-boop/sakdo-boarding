@@ -515,8 +515,10 @@
       <div class="exports" style="padding:4px 15px 15px">
         <button type="button" class="btn ghost sm" onclick="mgrChangePin()">🔑 열람 PIN 변경</button>
         <button type="button" class="btn ghost sm" onclick="mgrChangeDriverPin()">🚠 운전자 PIN 변경</button>
+        <button type="button" class="btn ghost sm" onclick="mgrChangeAdminPin()">👑 관리자 PIN 변경</button>
         <button type="button" class="btn ghost sm" onclick="lockApp()">🔒 잠금</button>
       </div>
+      <div class="hint" style="padding:0 15px 14px">PIN 변경은 관리자 PIN이 있어야 합니다. 처음엔 '열람 PIN 변경'을 눌러 관리자 PIN부터 설정하세요.</div>
     </div>
   </section>
 </main>
@@ -654,7 +656,8 @@
   // PIN 게이트: view=기록·허가 열람, driver=운행 상태 변경(운전자 전용, 별도 PIN)
   var GATES={
     view:  {pid:"security",  lk:"sakdo_unlock_v1",        lsk:"sakdo_pin_v1",      pin:"", ready:false, name:"기록·허가 열람", setDesc:"기록·허가 열람에 쓸 PIN을 정하세요 (숫자 4~8자리).", enterDesc:"기록·허가 열람 PIN을 입력하세요."},
-    driver:{pid:"driverpin", lk:"sakdo_driver_unlock_v1", lsk:"sakdo_driverpin_v1", pin:"", ready:false, name:"운전자", setDesc:"운행 상태를 바꿀 운전자 PIN을 정하세요 (숫자 4~8자리).", enterDesc:"삭도 운전자만 변경할 수 있습니다. 운전자 PIN을 입력하세요."}
+    driver:{pid:"driverpin", lk:"sakdo_driver_unlock_v1", lsk:"sakdo_driverpin_v1", pin:"", ready:false, name:"운전자", setDesc:"운행 상태를 바꿀 운전자 PIN을 정하세요 (숫자 4~8자리).", enterDesc:"삭도 운전자만 변경할 수 있습니다. 운전자 PIN을 입력하세요."},
+    admin: {pid:"adminpin",  lk:"sakdo_admin_unlock_v1",  lsk:"sakdo_adminpin_v1",  pin:"", ready:false, name:"관리자", setDesc:"관리자(마스터) PIN을 정하세요 (숫자 4~8자리). PIN 변경 권한입니다. 관리자만 아세요.", enterDesc:"PIN 변경은 관리자만 가능합니다. 관리자 PIN을 입력하세요."}
   };
   var pinPending=null, pinSetupMode=false, pinGate=null;
 
@@ -699,19 +702,20 @@
   // ---- PIN 잠금 (view=기록·허가 열람 / driver=운행 상태 변경) ----
   function gIsUnlocked(g){return lsGet(g.lk)===1;}
   function gSetUnlocked(g){lsSet(g.lk,1);}
-  window.lockApp=function(){try{localStorage.removeItem(GATES.view.lk);localStorage.removeItem(GATES.driver.lk);}catch(e){}toast("잠갔습니다");goCover();};
+  window.lockApp=function(){try{localStorage.removeItem(GATES.view.lk);localStorage.removeItem(GATES.driver.lk);localStorage.removeItem(GATES.admin.lk);}catch(e){}toast("잠갔습니다");goCover();};
   function loadPin(){
     if(mode==="shared"&&db){
       return db.collection("config").get().then(function(snap){
         snap.docs.forEach(function(d){
           if(d.id===GATES.view.pid)   GATES.view.pin   = (d.data()&&d.data().pin)||"";
           if(d.id===GATES.driver.pid) GATES.driver.pin = (d.data()&&d.data().pin)||"";
+          if(d.id===GATES.admin.pid)  GATES.admin.pin  = (d.data()&&d.data().pin)||"";
         });
-        GATES.view.ready=GATES.driver.ready=true;
-      }).catch(function(){GATES.view.ready=GATES.driver.ready=true;});
+        GATES.view.ready=GATES.driver.ready=GATES.admin.ready=true;
+      }).catch(function(){GATES.view.ready=GATES.driver.ready=GATES.admin.ready=true;});
     }
-    GATES.view.pin=lsGet(GATES.view.lsk)||""; GATES.driver.pin=lsGet(GATES.driver.lsk)||"";
-    GATES.view.ready=GATES.driver.ready=true; return Promise.resolve();
+    GATES.view.pin=lsGet(GATES.view.lsk)||""; GATES.driver.pin=lsGet(GATES.driver.lsk)||""; GATES.admin.pin=lsGet(GATES.admin.lsk)||"";
+    GATES.view.ready=GATES.driver.ready=GATES.admin.ready=true; return Promise.resolve();
   }
   function setPin(g,pin,cb){
     if(mode==="shared"&&db){
@@ -750,9 +754,11 @@
   }
   window.changePin=function(){ openPinModal(GATES.view, function(){toast("열람 PIN이 변경되었습니다");}, true); };
   window.changeDriverPin=function(){ openPinModal(GATES.driver, function(){toast("운전자 PIN이 변경되었습니다");}, true); };
-  // 설정 탭은 공개라, PIN 변경은 먼저 열람 PIN을 확인한 뒤 진행(아무나 못 바꾸게)
-  window.mgrChangePin=function(){ requireUnlock("view", function(){ changePin(); }); };
-  window.mgrChangeDriverPin=function(){ requireUnlock("view", function(){ changeDriverPin(); }); };
+  window.changeAdminPin=function(){ openPinModal(GATES.admin, function(){toast("관리자 PIN이 변경되었습니다");}, true); };
+  // PIN 변경은 '관리자 PIN'이 있어야만 가능(아무나 못 바꾸고, 잠겨도 관리자가 되돌림)
+  window.mgrChangePin=function(){ requireUnlock("admin", function(){ changePin(); }); };
+  window.mgrChangeDriverPin=function(){ requireUnlock("admin", function(){ changeDriverPin(); }); };
+  window.mgrChangeAdminPin=function(){ requireUnlock("admin", function(){ changeAdminPin(); }); };
   if($("pinOk"))$("pinOk").addEventListener("click",submitPin);
   if($("pinCancel"))$("pinCancel").addEventListener("click",closePinModal);
   ["pinInput","pinInput2"].forEach(function(id){
