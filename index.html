@@ -408,7 +408,10 @@
     <div class="card" id="partsCard">
       <div class="checkhead">
         <h2>예비품 현황</h2>
-        <button type="button" class="checkall" onclick="addPart()">＋ 추가</button>
+        <div style="display:flex;gap:7px">
+          <button type="button" class="checkall" onclick="exportParts()">⬇ CSV</button>
+          <button type="button" class="checkall" onclick="addPart()">＋ 추가</button>
+        </div>
       </div>
       <div id="partsList" style="padding:4px 15px 14px"></div>
     </div>
@@ -852,6 +855,11 @@
   }
   if($("partSave")) $("partSave").addEventListener("click",savePart);
   if($("partCancel")) $("partCancel").addEventListener("click",closePartModal);
+  window.exportParts=function(){
+    if(!partItems.length){ toast("예비품이 없습니다"); return; }
+    var cols=[["name","품명"],["spec","규격"],["qty","수량"],["loc","위치"],["note","비고"]];
+    saveFile("삭도_예비품현황.csv", buildCSV(partItems, cols, "__none__"), "text/csv");
+  };
 
   // ---- 폼 보조 ----
   window.setDir=function(d){dir=d;
