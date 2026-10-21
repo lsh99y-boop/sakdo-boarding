@@ -1,5 +1,5 @@
 /* 계룡산 삭도 기록 — 서비스워커(설치/오프라인 셸). 배포 시 CACHE 버전만 올리면 갱신됨. */
-const CACHE = "sakdo-shell-v1";
+const CACHE = "sakdo-shell-v2";
 const SHELL = [
   "./", "./index.html", "./config.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/icon-180.png",
