@@ -197,6 +197,19 @@
   .partform input{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--fg);font-size:15px;text-align:left;letter-spacing:normal}
   .partform input:focus{outline:2px solid var(--accent);outline-offset:-1px}
   .parterr{color:var(--warn);font-size:12.5px;font-weight:600;margin-top:8px}
+  /* 점검표 */
+  .inrow{padding:9px 15px;border-bottom:1px solid var(--line)}
+  .inrow:last-child{border-bottom:0}
+  .inname{font-size:14px;font-weight:600;margin-bottom:7px}
+  .inname .num{color:var(--muted);font-weight:700;margin-right:6px}
+  .inname .selftag{font-size:10.5px;font-weight:600;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+  .inbtns{display:flex;gap:6px}
+  .ib{flex:1;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);border-radius:9px;padding:9px 4px;font-size:13px;font-weight:700;cursor:pointer}
+  .ib.sel.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .ib.sel.ng{background:var(--warn);color:#fff;border-color:var(--warn)}
+  .ib.sel.na{background:var(--muted);color:#fff;border-color:var(--muted)}
+  .innote{width:100%;margin-top:7px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--fg);font-size:13px}
+  .innote:focus{outline:2px solid var(--accent);outline-offset:-1px}
 
   /* 겉표지 */
   #cover{position:fixed;inset:0;z-index:100;background:linear-gradient(165deg,#2a8159,var(--accent) 40%,#0e3a26);color:#fff;display:flex;overflow:auto}
@@ -269,9 +282,10 @@
       <span class="pic">✍️</span>
       <span class="ptxt">탑승자 기록<small>운행·탑승자 기록 작성</small></span>
     </button>
-    <div class="cmenu cmenu3">
+    <div class="cmenu">
       <button class="enter mini" onclick="enterApp('rec')"><span class="mi">📋</span>운행기록조회</button>
       <button class="enter mini" onclick="enterApp('parts')"><span class="mi">🧰</span>예비품</button>
+      <button class="enter mini" onclick="enterApp('inspect')"><span class="mi">✅</span>점검표</button>
       <button class="enter mini" onclick="enterApp('qr')"><span class="mi">⚙️</span>설정</button>
     </div>
   </div>
@@ -412,6 +426,23 @@
       </div>
       <div id="partsList" style="padding:4px 15px 14px"></div>
     </div>
+  </section>
+
+  <!-- 점검표 -->
+  <section class="panel" id="panel-inspect" hidden>
+    <div class="card">
+      <div class="recbar">
+        <div class="field"><label for="in-date">점검일자</label><input type="text" id="in-date" placeholder="예: 2026.10.14~10.16" autocomplete="off"></div>
+        <div class="field"><label for="in-inspector">점검자</label><input type="text" id="in-inspector" placeholder="안전관리자 / 업체" autocomplete="off"></div>
+      </div>
+      <div class="quickrange" style="padding:0 15px 6px">
+        <button type="button" class="btn ghost sm" onclick="inspAllGood()">✅ 전체 양호</button>
+        <button type="button" class="btn ghost sm" onclick="exportInspection()">⬇ 다운로드</button>
+        <button type="button" class="btn sm" onclick="saveInspection()" style="width:auto">💾 저장</button>
+      </div>
+      <div class="hint" id="in-updated" style="padding:0 15px 14px"></div>
+    </div>
+    <div class="card" id="inspList" style="margin-top:14px;padding:6px 0 8px"></div>
   </section>
 
   <!-- 허가 -->
@@ -676,7 +707,7 @@
 
   // ---- 탭 ----
   window.showTab=function(n){
-    ["write","rec","permit","qr","parts"].forEach(function(k){
+    ["write","rec","permit","qr","parts","inspect"].forEach(function(k){
       var pn=$("panel-"+k); if(pn) pn.hidden=(k!==n);
       var tb=$("tab-"+k); if(tb) tb.setAttribute("aria-selected", k===n?"true":"false");
     });
@@ -684,17 +715,18 @@
     if(n==="permit"){ renderPermits(); updateFee(); }
     if(n==="write") fillPermitSelect();
     if(n==="parts") renderParts();
+    if(n==="inspect") renderInspection();
     setHeader(n);
   };
   function setHeader(n){
-    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"설정",parts:"예비품 현황"};
+    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"설정",parts:"예비품 현황",inspect:"삭도시설 점검표"};
     var h=document.querySelector("header.top h1");
     if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
   }
   function openTab(tab){$("cover").hidden=true;showTab(tab);try{window.scrollTo(0,0);}catch(e){}}
   window.enterApp=function(tab){
     tab=tab||"write";
-    if(tab==="rec"||tab==="parts"){ requireUnlock("view",function(){openTab(tab);}); return; }
+    if(tab==="rec"||tab==="parts"||tab==="inspect"){ requireUnlock("view",function(){openTab(tab);}); return; }
     openTab(tab);
   };
   window.goCover=function(){$("cover").hidden=false;try{window.scrollTo(0,0);}catch(e){}};
@@ -874,6 +906,95 @@
     if(!partItems.length){ toast("예비품이 없습니다"); return; }
     var cols=[["name","품명"],["spec","규격"],["qty","수량"],["loc","위치"],["note","비고"]];
     saveFile("삭도_예비품현황.csv", buildCSV(partItems, cols, "__none__"), "text/csv");
+  };
+
+  // ---- 삭도시설 점검표 (config 'inspection', 단일 현재상태·수시 갱신) ----
+  var INKEY="sakdo_inspect_v1", inspUnsub=null;
+  var INSPECT_ITEMS=[
+    {n:"철탑, 전주(기초)"},{n:"수(앞)삭 장치"},{n:"밧줄 고정장치"},{n:"긴장활차"},{n:"안내활차"},
+    {n:"중추"},{n:"반기"},{n:"구동활차"},{n:"감속기 및 전동장치"},{n:"주 전동기"},{n:"예비 전동기"},
+    {n:"수동 전동기"},{n:"전동 제동기"},{n:"유(공)압 제동기"},
+    {n:"전선(콘트롤 케이블)",s:1},{n:"배전시설",s:1},{n:"운전제어",s:1},{n:"속도계 및 풍속계",s:1},
+    {n:"반기위치 표시등",s:1},{n:"피뢰장치",s:1},{n:"응급 하강장치"},{n:"밧줄 이상 장력 검출장치"},
+    {n:"속도 가속장치",s:1},{n:"유선설비",s:1},{n:"무선설비",s:1},{n:"절연저항",s:1},{n:"접지저항",s:1},
+    {n:"조명시설",s:1},{n:"승강장"},{n:"비상정지"},{n:"시운전"}
+  ];
+  var inspData={date:"",inspector:"",results:{},at:0,by:""};
+  function renderInspection(){
+    var box=$("inspList"); if(!box) return;
+    if($("in-date")) $("in-date").value=inspData.date||"";
+    if($("in-inspector")) $("in-inspector").value=inspData.inspector||"";
+    if($("in-updated")) $("in-updated").textContent= inspData.at ? ("최종 저장 "+new Date(inspData.at).toLocaleString("ko-KR")+(inspData.by?" · "+inspData.by:"")) : "아직 저장된 점검 결과가 없습니다.";
+    var map={"○":"ok","×":"ng","—":"na"};
+    box.innerHTML=INSPECT_ITEMS.map(function(it,i){
+      var cur=(inspData.results&&inspData.results[it.n])||{};
+      var r=cur.r||"";
+      function b(val,cls,label){ return '<button type="button" class="ib '+cls+(r===val?" sel":"")+'" onclick="setIns('+i+',\''+val+'\')">'+label+'</button>'; }
+      return '<div class="inrow" data-i="'+i+'" data-r="'+esc(r)+'">'+
+        '<div class="inname"><span class="num">'+(i+1)+'.</span>'+esc(it.n)+(it.s?'<span class="selftag">자체점검</span>':"")+'</div>'+
+        '<div class="inbtns">'+b("○","ok","양호")+b("×","ng","불량")+b("—","na","해당없음")+'</div>'+
+        '<input class="innote" id="innote-'+i+'" placeholder="문제점·대책 (불량 시 기재)" value="'+esc(cur.note||"")+'">'+
+        '</div>';
+    }).join("");
+  }
+  window.setIns=function(i,val){
+    var row=document.querySelector('.inrow[data-i="'+i+'"]'); if(!row) return;
+    var cur=row.getAttribute("data-r")===val?"":val;
+    row.setAttribute("data-r",cur);
+    row.querySelectorAll(".ib").forEach(function(b){ b.classList.remove("sel"); });
+    if(cur){ var map={"○":"ok","×":"ng","—":"na"}; var sel=row.querySelector(".ib."+map[cur]); if(sel) sel.classList.add("sel"); }
+  };
+  window.inspAllGood=function(){
+    document.querySelectorAll("#inspList .inrow").forEach(function(row){
+      row.setAttribute("data-r","○");
+      row.querySelectorAll(".ib").forEach(function(b){ b.classList.remove("sel"); });
+      var sel=row.querySelector(".ib.ok"); if(sel) sel.classList.add("sel");
+    });
+  };
+  function collectInspection(){
+    var res={};
+    document.querySelectorAll("#inspList .inrow").forEach(function(row){
+      var i=+row.getAttribute("data-i"); var name=INSPECT_ITEMS[i].n;
+      var r=row.getAttribute("data-r")||"";
+      var note=(($("innote-"+i)||{}).value||"").trim();
+      if(r||note) res[name]={r:r,note:note};
+    });
+    inspData.date=(($("in-date")||{}).value||"").trim();
+    inspData.inspector=(($("in-inspector")||{}).value||"").trim();
+    inspData.results=res;
+  }
+  window.saveInspection=function(){
+    collectInspection();
+    var obj={date:inspData.date,inspector:inspData.inspector,results:inspData.results,at:Date.now(),by:(lsGet(DRAFT)||{}).operator||""};
+    if(mode==="shared"&&db){
+      db.collection("config").doc("inspection").set(obj).then(function(){
+        inspData=obj; if($("in-updated"))$("in-updated").textContent="최종 저장 "+new Date(obj.at).toLocaleString("ko-KR")+(obj.by?" · "+obj.by:""); toast("점검표 저장됨");
+      }).catch(function(){toast("저장 실패 — 편집 권한 필요");});
+    }else{ lsSet(INKEY,obj); inspData=obj; renderInspection(); toast("점검표 저장됨"); }
+  };
+  function watchInspection(){
+    if(mode==="shared"&&db){
+      inspUnsub=db.collection("config").onSnapshot(function(snap){
+        var row=snap.docs.filter(function(d){return d.id==="inspection";})[0];
+        inspData=(row&&Object.assign({},row.data()))||{date:"",inspector:"",results:{},at:0,by:""};
+        if($("panel-inspect")&&!$("panel-inspect").hidden) renderInspection();
+      });
+    }else{ inspData=lsGet(INKEY)||{date:"",inspector:"",results:{},at:0,by:""}; }
+  }
+  window.exportInspection=function(){
+    collectInspection();
+    var lines=[];
+    lines.push("삭도시설 점검표");
+    lines.push("점검일자,"+csvCell(inspData.date||""));
+    lines.push("점검자,"+csvCell(inspData.inspector||""));
+    lines.push("");
+    lines.push(["점검항목","결과","문제점 및 대책","비고"].map(csvCell).join(","));
+    INSPECT_ITEMS.forEach(function(it){
+      var c=(inspData.results&&inspData.results[it.n])||{};
+      var r=c.r==="○"?"양호":c.r==="×"?"불량":c.r==="—"?"해당없음":"";
+      lines.push([(it.n), r, (c.note||""), (it.s?"자체점검":"")].map(csvCell).join(","));
+    });
+    saveFile("삭도시설점검표.csv", "﻿"+lines.join("\r\n"), "text/csv");
   };
 
   // ---- 폼 보조 ----
@@ -1287,7 +1408,7 @@
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts();
+    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection();
   }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);

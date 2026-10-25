@@ -6,3 +6,6 @@ Thumbs.db
 # Node (현재 미사용이지만 혹시 대비)
 node_modules/
 .vercel/
+
+# 내부 문서(서명·점검결과 등) — 커밋/배포 금지
+*.pdf
