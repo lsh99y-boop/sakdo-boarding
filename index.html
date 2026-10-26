@@ -198,6 +198,9 @@
   .partform input:focus{outline:2px solid var(--accent);outline-offset:-1px}
   .parterr{color:var(--warn);font-size:12.5px;font-weight:600;margin-top:8px}
   /* 점검표 */
+  .subtabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:12px}
+  .subtab{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;padding:10px 6px;font-size:13px;font-weight:700;cursor:pointer}
+  .subtab.sel{background:var(--accent);color:var(--accent-ink)}
   .inrow{padding:9px 15px;border-bottom:1px solid var(--line)}
   .inrow:last-child{border-bottom:0}
   .inname{font-size:14px;font-weight:600;margin-bottom:7px}
@@ -430,36 +433,73 @@
 
   <!-- 점검표 -->
   <section class="panel" id="panel-inspect" hidden>
-    <div class="card">
-      <div class="recbar">
-        <div class="field"><label for="in-date">점검일자</label><input type="text" id="in-date" placeholder="예: 2026.10.14~10.16" autocomplete="off" oninput="inspGuessQuarter()"></div>
-        <div class="field"><label for="in-quarter">분기</label><input type="text" id="in-quarter" placeholder="예: 2026년 3분기" autocomplete="off"></div>
-        <div class="field"><label for="in-vendor">점검업체(위탁)</label><input type="text" id="in-vendor" placeholder="위탁 점검 업체명" autocomplete="off"></div>
-        <div class="field"><label for="in-witness">KBS 입회자</label><input type="text" id="in-witness" placeholder="안전관리자 이름" autocomplete="off"></div>
-      </div>
-      <div class="quickrange" style="padding:0 15px 12px">
-        <button type="button" class="btn ghost sm" onclick="inspAllGood()">✅ 전체 양호</button>
-      </div>
-      <div class="hint" style="padding:0 15px 14px">아래 31개 항목을 점검하고, 보수·종합의견까지 적은 뒤 맨 아래 ‘점검 저장’을 누르면 한 회차로 쌓입니다.</div>
+    <div class="subtabs" role="tablist">
+      <button type="button" class="subtab sel" data-sub="facility" onclick="inspSub('facility')">삭도시설 점검표</button>
+      <button type="button" class="subtab" data-sub="quarter" onclick="inspSub('quarter')">분기점검</button>
+      <button type="button" class="subtab" data-sub="ts" onclick="inspSub('ts')">TS 정기점검</button>
     </div>
-    <div class="card" id="inspList" style="margin-top:14px;padding:6px 0 8px"></div>
-    <div class="card" style="margin-top:14px">
-      <div class="recbar" style="flex-direction:column;align-items:stretch">
-        <div class="field full"><label for="in-repair">보수·정비 내역</label><textarea id="in-repair" placeholder="이번 분기 점검에서 수행한 교체·수리·정비 내용"></textarea></div>
-        <div class="field full"><label for="in-opinion">종합 의견 / 판정</label><textarea id="in-opinion" placeholder="종합 의견, 운행 가능 여부·안전 판정 등"></textarea></div>
-      </div>
-      <div class="quickrange" style="padding:0 15px 14px">
-        <button type="button" class="btn sm" onclick="saveInspection()" style="width:auto">💾 점검 저장(회차 추가)</button>
-      </div>
-    </div>
-    <div class="card" id="inspHistCard" style="margin-top:14px">
-      <div class="checkhead">
-        <h2>점검 이력</h2>
-        <div style="display:flex;gap:7px">
-          <button type="button" class="checkall" onclick="exportInspection()">⬇ 전체 다운로드</button>
+
+    <!-- ① 삭도시설 점검표 (31항목 자체점검) -->
+    <div id="sub-facility">
+      <div class="card">
+        <div class="recbar">
+          <div class="field"><label for="in-date">점검일자</label><input type="text" id="in-date" placeholder="예: 2026.10.14~10.16" autocomplete="off"></div>
+          <div class="field"><label for="in-inspector">점검자</label><input type="text" id="in-inspector" placeholder="안전관리자" autocomplete="off"></div>
         </div>
+        <div class="quickrange" style="padding:0 15px 12px">
+          <button type="button" class="btn ghost sm" onclick="inspAllGood()">✅ 전체 양호</button>
+          <button type="button" class="btn sm" onclick="saveInspection()" style="width:auto">💾 점검 저장(회차 추가)</button>
+        </div>
+        <div class="hint" style="padding:0 15px 14px">자체 시설점검 31개 항목. 저장하면 아래 이력에 한 회차로 쌓입니다.</div>
       </div>
-      <div id="inspHistory" style="padding:4px 15px 14px"></div>
+      <div class="card" id="inspList" style="margin-top:14px;padding:6px 0 8px"></div>
+      <div class="card" id="inspHistCard" style="margin-top:14px">
+        <div class="checkhead"><h2>점검 이력</h2><div style="display:flex;gap:7px"><button type="button" class="checkall" onclick="exportInspection()">⬇ 전체 다운로드</button></div></div>
+        <div id="inspHistory" style="padding:4px 15px 14px"></div>
+      </div>
+    </div>
+
+    <!-- ② 분기점검 (위탁업체, 기록) -->
+    <div id="sub-quarter" hidden>
+      <div class="card">
+        <div class="recbar">
+          <div class="field"><label for="q-date">점검일자</label><input type="text" id="q-date" placeholder="예: 2026.10.14~10.16" autocomplete="off" oninput="qGuessQuarter()"></div>
+          <div class="field"><label for="q-quarter">분기</label><input type="text" id="q-quarter" placeholder="예: 2026년 3분기" autocomplete="off"></div>
+          <div class="field"><label for="q-vendor">점검업체(위탁)</label><input type="text" id="q-vendor" placeholder="위탁 점검 업체명" autocomplete="off"></div>
+          <div class="field"><label for="q-witness">KBS 입회자</label><input type="text" id="q-witness" placeholder="안전관리자 이름" autocomplete="off"></div>
+        </div>
+        <div class="recbar" style="flex-direction:column;align-items:stretch">
+          <div class="field full"><label for="q-repair">보수·정비 내역</label><textarea id="q-repair" placeholder="이번 분기 점검에서 수행한 교체·수리·정비 내용"></textarea></div>
+          <div class="field full"><label for="q-opinion">종합 의견 / 판정</label><textarea id="q-opinion" placeholder="종합 의견, 운행 가능 여부·안전 판정 등"></textarea></div>
+        </div>
+        <div class="quickrange" style="padding:0 15px 14px"><button type="button" class="btn sm" onclick="qLog.save()" style="width:auto">💾 분기점검 저장</button></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="checkhead"><h2>분기점검 이력</h2><div style="display:flex;gap:7px"><button type="button" class="checkall" onclick="qLog.exportAll()">⬇ 전체 다운로드</button></div></div>
+        <div id="qHistory" style="padding:4px 15px 14px"></div>
+      </div>
+    </div>
+
+    <!-- ③ TS 정기점검 (교통안전공단 검사 기록) -->
+    <div id="sub-ts" hidden>
+      <div class="card">
+        <div class="recbar">
+          <div class="field"><label for="ts-date">검사일</label><input type="text" id="ts-date" placeholder="예: 2026.09.20" autocomplete="off"></div>
+          <div class="field"><label for="ts-agency">검사기관</label><input type="text" id="ts-agency" value="한국교통안전공단(TS)" autocomplete="off"></div>
+          <div class="field"><label for="ts-kind">검사종류</label><input type="text" id="ts-kind" placeholder="예: 정기검사" autocomplete="off"></div>
+          <div class="field"><label for="ts-result">판정</label><select id="ts-result"><option value="">선택</option><option>적합</option><option>조건부 적합</option><option>부적합</option></select></div>
+          <div class="field"><label for="ts-valid">유효기간(차기검사)</label><input type="text" id="ts-valid" placeholder="예: 2027.09." autocomplete="off"></div>
+        </div>
+        <div class="recbar" style="flex-direction:column;align-items:stretch">
+          <div class="field full"><label for="ts-issues">지적사항</label><textarea id="ts-issues" placeholder="지적·보완 요구사항"></textarea></div>
+          <div class="field full"><label for="ts-note">비고</label><textarea id="ts-note" placeholder="기타 메모"></textarea></div>
+        </div>
+        <div class="quickrange" style="padding:0 15px 14px"><button type="button" class="btn sm" onclick="tsLog.save()" style="width:auto">💾 TS 점검 저장</button></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div class="checkhead"><h2>TS 정기점검 이력</h2><div style="display:flex;gap:7px"><button type="button" class="checkall" onclick="tsLog.exportAll()">⬇ 전체 다운로드</button></div></div>
+        <div id="tsHistory" style="padding:4px 15px 14px"></div>
+      </div>
     </div>
   </section>
 
@@ -926,7 +966,17 @@
     saveFile("삭도_예비품현황.csv", buildCSV(partItems, cols, "__none__"), "text/csv");
   };
 
-  // ---- 삭도시설 점검표 (config 'inspection', 회차 누적) ----
+  // ---- 점검표 서브탭 전환 ----
+  window.inspSub=function(name){
+    ["facility","quarter","ts"].forEach(function(k){ var el=$("sub-"+k); if(el) el.hidden=(k!==name); });
+    document.querySelectorAll("#panel-inspect .subtab").forEach(function(b){ b.classList.toggle("sel", b.getAttribute("data-sub")===name); });
+    if(name==="facility"){ if(!document.querySelector("#inspList .inrow")) renderInspectForm(); renderInspectHistory(); }
+    else if(name==="quarter"){ qLog.renderHist(); }
+    else if(name==="ts"){ tsLog.renderHist(); }
+    try{window.scrollTo(0,0);}catch(e){}
+  };
+
+  // ---- ① 삭도시설 점검표 (config 'inspection', 31항목 자체점검 회차 누적) ----
   var INKEY="sakdo_inspect_v1", inspUnsub=null, inspRecords=[];
   var INSPECT_ITEMS=[
     {n:"철탑, 전주(기초)"},{n:"수(앞)삭 장치"},{n:"밧줄 고정장치"},{n:"긴장활차"},{n:"안내활차"},
@@ -937,10 +987,9 @@
     {n:"속도 가속장치",s:1},{n:"유선설비",s:1},{n:"무선설비",s:1},{n:"절연저항",s:1},{n:"접지저항",s:1},
     {n:"조명시설",s:1},{n:"승강장"},{n:"비상정지"},{n:"시운전"}
   ];
-  // 작성 양식(빈 상태) 렌더
   function renderInspectForm(){
     var box=$("inspList"); if(!box) return;
-    ["in-date","in-quarter","in-vendor","in-witness","in-repair","in-opinion"].forEach(function(id){ if($(id)) $(id).value=""; });
+    ["in-date","in-inspector"].forEach(function(id){ if($(id)) $(id).value=""; });
     box.innerHTML=INSPECT_ITEMS.map(function(it,i){
       function b(val,cls,label){ return '<button type="button" class="ib '+cls+'" onclick="setIns('+i+',\''+val+'\')">'+label+'</button>'; }
       return '<div class="inrow" data-i="'+i+'" data-r="">'+
@@ -961,11 +1010,8 @@
     box.innerHTML=inspRecords.map(function(rec){
       var s=inspSummary(rec);
       var when=rec.at?new Date(rec.at).toLocaleString("ko-KR"):"";
-      var meta=[];
-      if(rec.quarter) meta.push(esc(rec.quarter));
-      if(rec.vendor) meta.push(esc(rec.vendor));
-      meta.push("양호 "+s.ok+" · 불량 "+s.ng+(s.na?" · 해당없음 "+s.na:""));
-      if(rec.witness) meta.push("입회 "+esc(rec.witness));
+      var meta=["양호 "+s.ok+" · 불량 "+s.ng+(s.na?" · 해당없음 "+s.na:"")];
+      if(rec.inspector) meta.push(esc(rec.inspector));
       if(when) meta.push("저장 "+when);
       return '<div class="partrow"><div class="pinfo">'+
         '<div class="pname">'+esc(rec.date||"-")+(s.ng?'<span class="pqty" style="color:var(--warn)">불량 '+s.ng+'</span>':"")+'</div>'+
@@ -976,7 +1022,7 @@
         '</div></div>';
     }).join("");
   }
-  function renderInspection(){ renderInspectForm(); renderInspectHistory(); }
+  function renderInspection(){ renderInspectForm(); inspSub("facility"); }
   window.setIns=function(i,val){
     var row=document.querySelector('.inrow[data-i="'+i+'"]'); if(!row) return;
     var cur=row.getAttribute("data-r")===val?"":val;
@@ -991,14 +1037,6 @@
       var sel=row.querySelector(".ib.ok"); if(sel) sel.classList.add("sel");
     });
   };
-  // 점검일자에서 분기 자동 추정(분기 칸이 비어 있을 때만)
-  window.inspGuessQuarter=function(){
-    var q=$("in-quarter"); if(!q||q.value.trim()) return;
-    var m=(($("in-date")||{}).value||"").match(/(20\d{2})\D{0,3}(\d{1,2})/);
-    if(!m) return;
-    var mon=parseInt(m[2],10); if(mon<1||mon>12) return;
-    q.value=m[1]+"년 "+(Math.floor((mon-1)/3)+1)+"분기";
-  };
   function collectInspection(){
     var res={};
     document.querySelectorAll("#inspList .inrow").forEach(function(row){
@@ -1007,15 +1045,7 @@
       var note=(($("innote-"+i)||{}).value||"").trim();
       if(r||note) res[name]={r:r,note:note};
     });
-    return {
-      date:(($("in-date")||{}).value||"").trim(),
-      quarter:(($("in-quarter")||{}).value||"").trim(),
-      vendor:(($("in-vendor")||{}).value||"").trim(),
-      witness:(($("in-witness")||{}).value||"").trim(),
-      repair:(($("in-repair")||{}).value||"").trim(),
-      opinion:(($("in-opinion")||{}).value||"").trim(),
-      results:res
-    };
+    return { date:(($("in-date")||{}).value||"").trim(), inspector:(($("in-inspector")||{}).value||"").trim(), results:res };
   }
   function saveInspRecords(arr, cb){
     var obj={records:arr, at:Date.now()};
@@ -1040,16 +1070,14 @@
         var row=snap.docs.filter(function(d){return d.id==="inspection";})[0];
         var data=(row&&Object.assign({},row.data()))||{};
         inspRecords=data.records||[];
-        if($("panel-inspect")&&!$("panel-inspect").hidden) renderInspectHistory();
+        if($("sub-facility")&&!$("sub-facility").hidden && $("panel-inspect") && !$("panel-inspect").hidden) renderInspectHistory();
       });
     }else{ var d=lsGet(INKEY)||{}; inspRecords=d.records||[]; }
   }
   function inspRecordLines(rec){
     var lines=[];
-    lines.push("분기,"+csvCell(rec.quarter||""));
     lines.push("점검일자,"+csvCell(rec.date||""));
-    lines.push("점검업체,"+csvCell(rec.vendor||""));
-    lines.push("KBS 입회자,"+csvCell(rec.witness||""));
+    lines.push("점검자,"+csvCell(rec.inspector||""));
     lines.push("");
     lines.push(["점검항목","결과","문제점 및 대책","비고"].map(csvCell).join(","));
     INSPECT_ITEMS.forEach(function(it){
@@ -1057,33 +1085,103 @@
       var r=c.r==="○"?"양호":c.r==="×"?"불량":c.r==="—"?"해당없음":"";
       lines.push([(it.n), r, (c.note||""), (it.s?"자체점검":"")].map(csvCell).join(","));
     });
-    lines.push("");
-    lines.push("보수·정비 내역,"+csvCell(rec.repair||""));
-    lines.push("종합 의견/판정,"+csvCell(rec.opinion||""));
     return lines;
   }
   window.exportInspRecord=function(id){
     var rec=inspRecords.filter(function(r){return r.id===id;})[0]; if(!rec){ toast("기록을 찾을 수 없습니다"); return; }
     var lines=["삭도시설 점검표"].concat(inspRecordLines(rec));
-    var tag=(rec.date||rec.quarter||"").replace(/[^0-9]/g,"")||"회차";
+    var tag=(rec.date||"").replace(/[^0-9]/g,"")||"회차";
     saveFile("삭도시설점검표_"+tag+".csv", "﻿"+lines.join("\r\n"), "text/csv");
   };
   window.exportInspection=function(){
     if(!inspRecords.length){ toast("저장된 점검이 없습니다"); return; }
     var lines=["삭도시설 점검표 — 전체 회차",""];
-    lines.push(["분기","점검일자","점검업체","KBS 입회자","양호","불량","해당없음","저장일시"].map(csvCell).join(","));
+    lines.push(["점검일자","점검자","양호","불량","해당없음","저장일시"].map(csvCell).join(","));
     inspRecords.forEach(function(rec){
       var s=inspSummary(rec);
-      lines.push([rec.quarter||"", rec.date||"", rec.vendor||"", rec.witness||"", s.ok, s.ng, s.na, rec.at?new Date(rec.at).toLocaleString("ko-KR"):""].map(csvCell).join(","));
+      lines.push([rec.date||"", rec.inspector||"", s.ok, s.ng, s.na, rec.at?new Date(rec.at).toLocaleString("ko-KR"):""].map(csvCell).join(","));
     });
     lines.push(""); lines.push("");
     inspRecords.forEach(function(rec){
-      lines.push("■ "+csvCell((rec.quarter||rec.date||"")+(rec.vendor?" / "+rec.vendor:"")));
+      lines.push("■ "+csvCell((rec.date||"")+(rec.inspector?" / "+rec.inspector:"")));
       lines=lines.concat(inspRecordLines(rec));
       lines.push("");
     });
     saveFile("삭도시설점검표_전체.csv", "﻿"+lines.join("\r\n"), "text/csv");
   };
+  window.qGuessQuarter=function(){
+    var q=$("q-quarter"); if(!q||q.value.trim()) return;
+    var m=(($("q-date")||{}).value||"").match(/(20\d{2})\D{0,3}(\d{1,2})/);
+    if(!m) return; var mon=parseInt(m[2],10); if(mon<1||mon>12) return;
+    q.value=m[1]+"년 "+(Math.floor((mon-1)/3)+1)+"분기";
+  };
+
+  // ---- ②③ 기록 로그 엔진 (분기점검·TS 정기점검 공용) ----
+  function makeRecordLog(o){
+    var L={records:[], unsub:null};
+    function persist(arr, cb){
+      var obj={records:arr, at:Date.now()};
+      if(mode==="shared"&&db){ db.collection("config").doc(o.docId).set(obj).then(function(){L.records=arr;L.renderHist();cb&&cb();}).catch(function(){toast("저장 실패 — 편집 권한 필요");}); }
+      else { lsSet(o.lsKey,obj); L.records=arr; L.renderHist(); cb&&cb(); }
+    }
+    L.clearForm=function(){ o.fields.forEach(function(f){ if($(f.id)) $(f.id).value=(o.defaults&&o.defaults[f.id])||""; }); };
+    L.save=function(){
+      var r={}; o.fields.forEach(function(f){ r[f.id]=(($(f.id)||{}).value||"").trim(); });
+      if(!r[o.requireId]){ toast(o.requireLabel+"을(를) 입력하세요"); return; }
+      r.id=genId(); r.at=Date.now();
+      persist([r].concat(L.records), function(){ toast("저장되었습니다"); L.clearForm(); try{window.scrollTo(0,0);}catch(e){} });
+    };
+    L.del=function(id){ if(!window.confirm("이 기록을 삭제할까요?")) return; persist(L.records.filter(function(x){return x.id!==id;}), function(){toast("삭제되었습니다");}); };
+    L.renderHist=function(){
+      var box=$(o.histId); if(!box) return;
+      if(!L.records.length){ box.innerHTML='<div class="partsempty">저장된 기록이 없습니다. 위 양식을 작성해 저장하세요.</div>'; return; }
+      box.innerHTML=L.records.map(function(rec){
+        var meta=o.metaIds.map(function(id){return rec[id];}).filter(Boolean).map(esc);
+        var when=rec.at?new Date(rec.at).toLocaleString("ko-KR"):"";
+        if(when) meta.push("저장 "+when);
+        return '<div class="partrow"><div class="pinfo">'+
+          '<div class="pname">'+esc(rec[o.titleId]||rec[o.requireId]||"-")+'</div>'+
+          '<div class="pmeta">'+meta.join(" · ")+'</div>'+
+          '</div><div class="pacts">'+
+          '<button type="button" onclick="'+o.ns+'.exportOne(\''+rec.id+'\')">⬇</button>'+
+          '<button type="button" class="pdel" onclick="'+o.ns+'.del(\''+rec.id+'\')">삭제</button>'+
+          '</div></div>';
+      }).join("");
+    };
+    function recLines(rec){ return o.fields.map(function(f){ return csvCell(f.label)+","+csvCell(rec[f.id]||""); }); }
+    L.exportOne=function(id){
+      var rec=L.records.filter(function(x){return x.id===id;})[0]; if(!rec){ toast("기록을 찾을 수 없습니다"); return; }
+      var lines=[o.csvTitle].concat(recLines(rec));
+      var tag=(rec[o.titleId]||rec[o.requireId]||"").replace(/[^0-9]/g,"")||"기록";
+      saveFile(o.csvTitle+"_"+tag+".csv", "﻿"+lines.join("\r\n"), "text/csv");
+    };
+    L.exportAll=function(){
+      if(!L.records.length){ toast("저장된 기록이 없습니다"); return; }
+      var lines=[o.csvTitle+" — 전체",""];
+      lines.push(o.fields.map(function(f){return csvCell(f.label);}).concat([csvCell("저장일시")]).join(","));
+      L.records.forEach(function(rec){ lines.push(o.fields.map(function(f){return csvCell(rec[f.id]||"");}).concat([csvCell(rec.at?new Date(rec.at).toLocaleString("ko-KR"):"")]).join(",")); });
+      lines.push(""); lines.push("");
+      L.records.forEach(function(rec){ lines.push("■ "+csvCell(rec[o.titleId]||rec[o.requireId]||"")); lines=lines.concat(recLines(rec)); lines.push(""); });
+      saveFile(o.csvTitle+"_전체.csv", "﻿"+lines.join("\r\n"), "text/csv");
+    };
+    L.watch=function(){
+      if(mode==="shared"&&db){ L.unsub=db.collection("config").onSnapshot(function(snap){ var row=snap.docs.filter(function(d){return d.id===o.docId;})[0]; var data=(row&&Object.assign({},row.data()))||{}; L.records=data.records||[]; var sp=$("sub-"+o.sub); if(sp&&!sp.hidden&&$("panel-inspect")&&!$("panel-inspect").hidden) L.renderHist(); }); }
+      else { var d=lsGet(o.lsKey)||{}; L.records=d.records||[]; }
+    };
+    return L;
+  }
+  var qLog=makeRecordLog({
+    docId:"inspect_quarter", lsKey:"sakdo_inspect_q_v1", histId:"qHistory", sub:"quarter", ns:"qLog",
+    csvTitle:"분기점검", requireId:"q-date", requireLabel:"점검일자", titleId:"q-quarter", metaIds:["q-vendor","q-witness"],
+    fields:[{id:"q-quarter",label:"분기"},{id:"q-date",label:"점검일자"},{id:"q-vendor",label:"점검업체"},{id:"q-witness",label:"KBS 입회자"},{id:"q-repair",label:"보수·정비 내역"},{id:"q-opinion",label:"종합 의견/판정"}]
+  });
+  var tsLog=makeRecordLog({
+    docId:"inspect_ts", lsKey:"sakdo_inspect_ts_v1", histId:"tsHistory", sub:"ts", ns:"tsLog",
+    csvTitle:"TS 정기점검", requireId:"ts-date", requireLabel:"검사일", titleId:"ts-date", metaIds:["ts-kind","ts-result","ts-valid"],
+    defaults:{"ts-agency":"한국교통안전공단(TS)"},
+    fields:[{id:"ts-date",label:"검사일"},{id:"ts-agency",label:"검사기관"},{id:"ts-kind",label:"검사종류"},{id:"ts-result",label:"판정"},{id:"ts-valid",label:"유효기간(차기검사)"},{id:"ts-issues",label:"지적사항"},{id:"ts-note",label:"비고"}]
+  });
+  window.qLog=qLog; window.tsLog=tsLog;
 
   // ---- 폼 보조 ----
   window.setDir=function(d){dir=d;
@@ -1496,7 +1594,7 @@
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection();
+    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection(); qLog.watch(); tsLog.watch();
   }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
