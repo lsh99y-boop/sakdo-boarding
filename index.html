@@ -777,7 +777,7 @@
     setHeader(n);
   };
   function setHeader(n){
-    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"설정",parts:"예비품 현황",inspect:"삭도시설 점검표"};
+    var titles={write:"일일탑승기록",rec:"탑승 기록",permit:"탑승 등록 신청",qr:"설정",parts:"예비품 현황",inspect:"점검표"};
     var h=document.querySelector("header.top h1");
     if(h) h.textContent="🚠 "+(titles[n]||"일일탑승일지");
   }
