@@ -1007,7 +1007,6 @@
 
   // ---- ① 삭도시설 정기점검기록부 (공식 양식, config 'inspection', 회차 누적) ----
   var INKEY="sakdo_inspect_v1", inspUnsub=null, inspRecords=[];
-  var INSPECT_FIXED={상호:"한국방송공사 (대전)",대표자:"사장",소재지:"충남 계룡시 신도안면 부남리 산6",삭도구분:"왕복식삭도",관리번호:"계룡산송신소",승차정원:"6X2",준공일자:"1998-04-08"};
   var INSPECT_ATTACH=[{id:"susak",label:"수삭장치검사표"},{id:"rope",label:"와이어로프검사표"},{id:"insul",label:"절연저항검사표"},{id:"ground",label:"접지저항검사표"},{id:"trial",label:"시운전결과검사표"}];
   var INSPECT_GROUPS=[
     {no:"⑧", items:[{n:"지주(기초, 지주)"}]},
@@ -1130,13 +1129,7 @@
   }
   function inspRecordLines(rec){
     var lines=[];
-    lines.push("상호,"+csvCell(INSPECT_FIXED.상호));
-    lines.push("대표자,"+csvCell(INSPECT_FIXED.대표자));
-    lines.push("소재지,"+csvCell(INSPECT_FIXED.소재지));
-    lines.push("삭도구분,"+csvCell(INSPECT_FIXED.삭도구분));
-    lines.push("관리번호,"+csvCell(INSPECT_FIXED.관리번호)+",승차정원,"+csvCell(INSPECT_FIXED.승차정원));
-    lines.push("준공일자,"+csvCell(INSPECT_FIXED.준공일자)+",가동시간,"+csvCell(rec.runHours||""));
-    lines.push("점검일자,"+csvCell(rec.date||""));
+    lines.push("점검일자,"+csvCell(rec.date||"")+",가동시간,"+csvCell(rec.runHours||""));
     lines.push("");
     lines.push(["번호","분류","점검항목","점검결과","정비개요"].map(csvCell).join(","));
     INSPECT_GROUPS.forEach(function(gr){
