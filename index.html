@@ -1357,9 +1357,10 @@
   function renderRecords(){
     var trips=day.length, people=day.reduce(function(a,e){return a+(e.count||0);},0);
     var up=day.filter(function(e){return e.direction==="상행";}).length;
-    var runTxt='<span style="font-size:16px">'+fmtRun(trips*RUNMIN)+'</span>';
+    var totalTrips=(mode==="shared")?allTrips:(lsGet(LKEY)||[]).length;
+    var runTxt='<span style="font-size:16px">'+fmtRun(totalTrips*RUNMIN)+'</span>';
     $("summary").innerHTML=
-      stat(trips,"운행 횟수")+stat(people,"총 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행")+stat(runTxt,"운행시간 (회당 "+RUNMIN+"분)");
+      stat(trips,"운행 횟수")+stat(people,"총 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행")+stat(runTxt,"총운행시간 (누적·회당 "+RUNMIN+"분)");
     var list=$("reclist");
     var multiDay=(rangeFrom!==rangeTo);
     var rangeLabel=multiDay?(fmtDate(rangeFrom)+" ~ "+fmtDate(rangeTo)):fmtDate(rangeFrom);
@@ -1386,6 +1387,16 @@
   function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
   var RUNMIN=25; // 상/하행 1회 운행 소요시간(분)
   function fmtRun(m){ if(!m) return "0분"; var h=Math.floor(m/60), mm=m%60; return h?(h+"시간"+(mm?" "+mm+"분":"")):(mm+"분"); }
+  // 총운행시간(누적): 전체 탑승기록 건수 × RUNMIN. 기간 조회와 무관하게 전체 집계.
+  var allTrips=0, totalRunUnsub=null;
+  function watchTotalRun(){
+    if(mode==="shared"&&db){
+      totalRunUnsub=db.collection("entries").onSnapshot(function(snap){
+        allTrips=snap.docs.length;
+        if($("summary")) renderRecords();
+      });
+    }else{ allTrips=(lsGet(LKEY)||[]).length; }
+  }
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmtDate(s){if(!s)return"";var p=s.split("-");return p[0]+"년 "+(+p[1])+"월 "+(+p[2])+"일";}
 
@@ -1655,7 +1666,7 @@
     }else{
       db=null; mode="local";
     }
-    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection(); qLog.watch(); tsLog.watch();
+    reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection(); qLog.watch(); tsLog.watch(); watchTotalRun();
     setHdrH(); window.addEventListener("resize", setHdrH); window.addEventListener("orientationchange", setHdrH);
   }
   // 서브탭 sticky 위치용: 헤더 실제 높이(안전영역 포함)를 --hdrh에 반영
