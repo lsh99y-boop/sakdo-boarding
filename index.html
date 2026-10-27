@@ -213,6 +213,20 @@
   .ib.sel.na{background:var(--muted);color:#fff;border-color:var(--muted)}
   .innote{width:100%;margin-top:7px;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;color:var(--fg);font-size:13px}
   .innote:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  /* 정기점검기록부(그룹형 드롭다운) */
+  .fixedinfo{padding:12px 15px;font-size:12px;color:var(--muted);line-height:1.75}
+  .ingrouphdr{padding:12px 15px 2px;font-size:12px;font-weight:700;color:var(--accent)}
+  .ingrouphdr .ignum{margin-right:5px}
+  .inrow2{padding:9px 15px;border-bottom:1px solid var(--line)}
+  .inrow2:last-child{border-bottom:0}
+  .inname2{font-size:13.5px;font-weight:600;margin-bottom:7px}
+  .inname2 .num{color:var(--muted);font-weight:700;margin-right:6px}
+  .inname2 .sub{color:var(--muted);margin-right:6px}
+  .inctl{display:flex;gap:8px}
+  .insel{flex:0 0 auto;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px 8px;color:var(--fg);font-size:13px;font-weight:600}
+  .innote2{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:9px 10px;color:var(--fg);font-size:13px}
+  .innote2:focus,.insel:focus{outline:2px solid var(--accent);outline-offset:-1px}
+  .attchk{font-size:13px;color:var(--fg);display:inline-flex;align-items:center;gap:6px}
 
   /* 겉표지 */
   #cover{position:fixed;inset:0;z-index:100;background:linear-gradient(165deg,#2a8159,var(--accent) 40%,#0e3a26);color:#fff;display:flex;overflow:auto}
@@ -439,20 +453,37 @@
       <button type="button" class="subtab" data-sub="ts" onclick="inspSub('ts')">TS 정기점검</button>
     </div>
 
-    <!-- ① 삭도시설 점검표 (31항목 자체점검) -->
+    <!-- ① 삭도시설 정기점검기록부 (공식 양식) -->
     <div id="sub-facility">
       <div class="card">
+        <div class="fixedinfo">
+          상호 한국방송공사(대전) · 대표자 사장 · 삭도구분 왕복식삭도<br>
+          소재지 충남 계룡시 신도안면 부남리 산6<br>
+          관리번호 계룡산송신소 · 승차정원 6X2 · 준공일자 1998-04-08
+        </div>
         <div class="recbar">
-          <div class="field"><label for="in-date">점검일자</label><input type="text" id="in-date" placeholder="예: 2026.10.14~10.16" autocomplete="off"></div>
-          <div class="field"><label for="in-inspector">점검자</label><input type="text" id="in-inspector" placeholder="안전관리자" autocomplete="off"></div>
+          <div class="field"><label for="in-date">점검일자</label><input type="text" id="in-date" placeholder="예: 2026.09.09~09.11" autocomplete="off"></div>
+          <div class="field"><label for="in-runhours">가동시간</label><input type="text" id="in-runhours" placeholder="예: 18,730" autocomplete="off"></div>
+          <div class="field"><label for="in-inspector">점검자</label><input type="text" id="in-inspector" placeholder="점검자" autocomplete="off"></div>
+          <div class="field"><label for="in-opdate">정비완료일자</label><input type="text" id="in-opdate" placeholder="예: 2026.09.11" autocomplete="off"></div>
+          <div class="field"><label for="in-repairer">정비자</label><input type="text" id="in-repairer" placeholder="정비자" autocomplete="off"></div>
+          <div class="field"><label for="in-safety">안전관리자</label><input type="text" id="in-safety" placeholder="안전관리자" autocomplete="off"></div>
         </div>
-        <div class="quickrange" style="padding:0 15px 12px">
-          <button type="button" class="btn ghost sm" onclick="inspAllGood()">✅ 전체 양호</button>
-          <button type="button" class="btn sm" onclick="saveInspection()" style="width:auto">💾 점검 저장(회차 추가)</button>
-        </div>
-        <div class="hint" style="padding:0 15px 14px">자체 시설점검 31개 항목. 저장하면 아래 이력에 한 회차로 쌓입니다.</div>
       </div>
-      <div class="card" id="inspList" style="margin-top:14px;padding:6px 0 8px"></div>
+      <div class="card" id="inspListCard" style="margin-top:14px">
+        <div class="checkhead"><h2>점검 항목</h2><div style="display:flex;gap:7px"><button type="button" class="checkall" onclick="inspAllGood()">✅ 전체 양호</button></div></div>
+        <div id="inspList" style="padding:2px 0 6px"></div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <div style="padding:12px 15px 2px">
+          <label style="font-size:12.5px;font-weight:600;color:var(--muted)">별첨서류</label>
+          <div id="in-attach" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:9px"></div>
+        </div>
+        <div class="recbar" style="flex-direction:column;align-items:stretch">
+          <div class="field full"><label for="in-maint">정비내용</label><textarea id="in-maint" placeholder="점검·정비 내용" style="min-height:92px"></textarea></div>
+        </div>
+        <div class="quickrange" style="padding:0 15px 14px"><button type="button" class="btn sm" onclick="saveInspection()" style="width:auto">💾 점검 저장(회차 추가)</button></div>
+      </div>
       <div class="card" id="inspHistCard" style="margin-top:14px">
         <div class="checkhead"><h2>점검 이력</h2><div style="display:flex;gap:7px"><button type="button" class="checkall" onclick="exportInspection()">⬇ 전체 다운로드</button></div></div>
         <div id="inspHistory" style="padding:4px 15px 14px"></div>
@@ -970,39 +1001,61 @@
   window.inspSub=function(name){
     ["facility","quarter","ts"].forEach(function(k){ var el=$("sub-"+k); if(el) el.hidden=(k!==name); });
     document.querySelectorAll("#panel-inspect .subtab").forEach(function(b){ b.classList.toggle("sel", b.getAttribute("data-sub")===name); });
-    if(name==="facility"){ if(!document.querySelector("#inspList .inrow")) renderInspectForm(); renderInspectHistory(); }
+    if(name==="facility"){ if(!document.querySelector("#inspList .inrow2")) renderInspectForm(); renderInspectHistory(); }
     else if(name==="quarter"){ qLog.renderHist(); }
     else if(name==="ts"){ tsLog.renderHist(); }
     try{window.scrollTo(0,0);}catch(e){}
   };
 
-  // ---- ① 삭도시설 점검표 (config 'inspection', 31항목 자체점검 회차 누적) ----
+  // ---- ① 삭도시설 정기점검기록부 (공식 양식, config 'inspection', 회차 누적) ----
   var INKEY="sakdo_inspect_v1", inspUnsub=null, inspRecords=[];
-  var INSPECT_ITEMS=[
-    {n:"철탑, 전주(기초)"},{n:"수(앞)삭 장치"},{n:"밧줄 고정장치"},{n:"긴장활차"},{n:"안내활차"},
-    {n:"중추"},{n:"반기"},{n:"구동활차"},{n:"감속기 및 전동장치"},{n:"주 전동기"},{n:"예비 전동기"},
-    {n:"수동 전동기"},{n:"전동 제동기"},{n:"유(공)압 제동기"},
-    {n:"전선(콘트롤 케이블)",s:1},{n:"배전시설",s:1},{n:"운전제어",s:1},{n:"속도계 및 풍속계",s:1},
-    {n:"반기위치 표시등",s:1},{n:"피뢰장치",s:1},{n:"응급 하강장치"},{n:"밧줄 이상 장력 검출장치"},
-    {n:"속도 가속장치",s:1},{n:"유선설비",s:1},{n:"무선설비",s:1},{n:"절연저항",s:1},{n:"접지저항",s:1},
-    {n:"조명시설",s:1},{n:"승강장"},{n:"비상정지"},{n:"시운전"}
+  var INSPECT_FIXED={상호:"한국방송공사 (대전)",대표자:"사장",소재지:"충남 계룡시 신도안면 부남리 산6",삭도구분:"왕복식삭도",관리번호:"계룡산송신소",승차정원:"6X2",준공일자:"1998-04-08"};
+  var INSPECT_ATTACH=[{id:"susak",label:"수삭장치검사표"},{id:"rope",label:"와이어로프검사표"},{id:"insul",label:"절연저항검사표"},{id:"ground",label:"접지저항검사표"},{id:"trial",label:"시운전결과검사표"}];
+  var INSPECT_GROUPS=[
+    {no:"⑧", items:[{n:"지주(기초, 지주)"}]},
+    {no:"⑨", items:[{n:"수(압)삭장치"}]},
+    {no:"⑩", items:[{n:"와이어로프"}]},
+    {no:"⑪", g:"긴장장치", items:[{n:"와이어로프고정장치"},{n:"긴장활차"},{n:"중추"},{n:"유(공)압긴장장치",na:1},{n:"대차",na:1}]},
+    {no:"⑫", g:"차량", items:[{n:"차량"},{n:"연결장치",na:1},{n:"접속장치"}]},
+    {no:"⑬", g:"감기구동장치", items:[{n:"구동활차"},{n:"감속기 및 전동장치"},{n:"주전동기"},{n:"내연기관",note:"예비전동기"}]},
+    {no:"⑭", g:"제동장치", items:[{n:"수동제동기",note:"전동"},{n:"전자제동기"},{n:"유(공)압제동기"},{n:"역전방지장치",na:1}]},
+    {no:"⑮", g:"배전선로", items:[{n:"전주 및 전선"},{n:"배전시설"}]},
+    {no:"⑯", g:"제어설비", items:[{n:"운전제어"},{n:"유(공)압긴장제어장치",na:1}]},
+    {no:"⑰", g:"보안설비", items:[{n:"속도계 및 풍속계"},{n:"차량위치표시기등"},{n:"피뢰장치"},{n:"응급하강장치"},{n:"와이어로프이탈감지장치등",na:1},{n:"와이어로프이상장력검출장치"},{n:"속도감속장치등"}]},
+    {no:"⑱", g:"통신설비", items:[{n:"유선설비"},{n:"무선설비"}]},
+    {no:"⑲", items:[{n:"절연저항"}]},
+    {no:"⑳", items:[{n:"접지저항"}]},
+    {no:"㉑", items:[{n:"조명 및 승강시설"}]},
+    {no:"㉒", items:[{n:"시운전"}]},
+    {no:"㉓", items:[{n:"기타",na:1}]}
   ];
+  var INSPECT_STATES=["양호","불량","조정","수리","분해","교환","해당없음"];
   function renderInspectForm(){
     var box=$("inspList"); if(!box) return;
-    ["in-date","in-inspector"].forEach(function(id){ if($(id)) $(id).value=""; });
-    box.innerHTML=INSPECT_ITEMS.map(function(it,i){
-      function b(val,cls,label){ return '<button type="button" class="ib '+cls+'" onclick="setIns('+i+',\''+val+'\')">'+label+'</button>'; }
-      return '<div class="inrow" data-i="'+i+'" data-r="">'+
-        '<div class="inname"><span class="num">'+(i+1)+'.</span>'+esc(it.n)+(it.s?'<span class="selftag">자체점검</span>':"")+'</div>'+
-        '<div class="inbtns">'+b("○","ok","양호")+b("×","ng","불량")+b("—","na","해당없음")+'</div>'+
-        '<input class="innote" id="innote-'+i+'" placeholder="문제점·대책 (불량 시 기재)" value="">'+
+    ["in-date","in-runhours","in-inspector","in-opdate","in-repairer","in-safety","in-maint"].forEach(function(id){ if($(id)) $(id).value=""; });
+    var at=$("in-attach"); if(at) at.innerHTML=INSPECT_ATTACH.map(function(a){ return '<label class="attchk"><input type="checkbox" id="att-'+a.id+'"> '+esc(a.label)+'</label>'; }).join("");
+    function row(it,sub,no){
+      var def=it.na?"해당없음":"";
+      var opts='<option value=""'+(def===""?" selected":"")+'>선택</option>'+INSPECT_STATES.map(function(s){return '<option'+(s===def?" selected":"")+'>'+s+'</option>';}).join("");
+      var nm=sub?('<span class="sub">└</span>'+esc(it.n)):('<span class="num">'+(no||"")+'</span>'+esc(it.n));
+      return '<div class="inrow2" data-n="'+esc(it.n)+'"'+(it.na?' data-na="1"':"")+'>'+
+        '<div class="inname2">'+nm+'</div>'+
+        '<div class="inctl"><select class="insel">'+opts+'</select>'+
+        '<input class="innote2" placeholder="정비개요" value="'+esc(it.note||"")+'"></div>'+
         '</div>';
-    }).join("");
+    }
+    var html="";
+    INSPECT_GROUPS.forEach(function(gr){
+      if(gr.g){ html+='<div class="ingrouphdr"><span class="ignum">'+gr.no+'</span>'+esc(gr.g)+'</div>'; gr.items.forEach(function(it){ html+=row(it,true); }); }
+      else { gr.items.forEach(function(it){ html+=row(it,false,gr.no); }); }
+    });
+    box.innerHTML=html;
   }
   function inspSummary(rec){
-    var ok=0,ng=0,na=0;
-    Object.keys(rec.results||{}).forEach(function(k){var r=rec.results[k].r; if(r==="○")ok++;else if(r==="×")ng++;else if(r==="—")na++;});
-    return {ok:ok,ng:ng,na:na};
+    var c={양호:0,불량:0,조정:0,수리:0,분해:0,교환:0,해당없음:0};
+    Object.keys(rec.results||{}).forEach(function(k){ var r=(rec.results[k]||{}).r; if(c[r]!=null)c[r]++; });
+    c.조치=c.조정+c.수리+c.분해+c.교환;
+    return c;
   }
   function renderInspectHistory(){
     var box=$("inspHistory"); if(!box) return;
@@ -1010,11 +1063,12 @@
     box.innerHTML=inspRecords.map(function(rec){
       var s=inspSummary(rec);
       var when=rec.at?new Date(rec.at).toLocaleString("ko-KR"):"";
-      var meta=["양호 "+s.ok+" · 불량 "+s.ng+(s.na?" · 해당없음 "+s.na:"")];
+      var meta=["양호 "+s.양호+" · 불량 "+s.불량+(s.조치?" · 조치 "+s.조치:"")+(s.해당없음?" · 해당없음 "+s.해당없음:"")];
       if(rec.inspector) meta.push(esc(rec.inspector));
       if(when) meta.push("저장 "+when);
+      var badge=s.불량?('<span class="pqty" style="color:var(--warn)">불량 '+s.불량+'</span>'):(s.조치?('<span class="pqty" style="color:var(--warn)">조치 '+s.조치+'</span>'):"");
       return '<div class="partrow"><div class="pinfo">'+
-        '<div class="pname">'+esc(rec.date||"-")+(s.ng?'<span class="pqty" style="color:var(--warn)">불량 '+s.ng+'</span>':"")+'</div>'+
+        '<div class="pname">'+esc(rec.date||"-")+badge+'</div>'+
         '<div class="pmeta">'+meta.join(" · ")+'</div>'+
         '</div><div class="pacts">'+
         '<button type="button" onclick="exportInspRecord(\''+rec.id+'\')">⬇</button>'+
@@ -1023,29 +1077,31 @@
     }).join("");
   }
   function renderInspection(){ renderInspectForm(); inspSub("facility"); }
-  window.setIns=function(i,val){
-    var row=document.querySelector('.inrow[data-i="'+i+'"]'); if(!row) return;
-    var cur=row.getAttribute("data-r")===val?"":val;
-    row.setAttribute("data-r",cur);
-    row.querySelectorAll(".ib").forEach(function(b){ b.classList.remove("sel"); });
-    if(cur){ var map={"○":"ok","×":"ng","—":"na"}; var sel=row.querySelector(".ib."+map[cur]); if(sel) sel.classList.add("sel"); }
-  };
   window.inspAllGood=function(){
-    document.querySelectorAll("#inspList .inrow").forEach(function(row){
-      row.setAttribute("data-r","○");
-      row.querySelectorAll(".ib").forEach(function(b){ b.classList.remove("sel"); });
-      var sel=row.querySelector(".ib.ok"); if(sel) sel.classList.add("sel");
+    document.querySelectorAll("#inspList .inrow2").forEach(function(row){
+      if(row.getAttribute("data-na")==="1") return;
+      var s=row.querySelector(".insel"); if(s) s.value="양호";
     });
   };
   function collectInspection(){
     var res={};
-    document.querySelectorAll("#inspList .inrow").forEach(function(row){
-      var i=+row.getAttribute("data-i"); var name=INSPECT_ITEMS[i].n;
-      var r=row.getAttribute("data-r")||"";
-      var note=(($("innote-"+i)||{}).value||"").trim();
-      if(r||note) res[name]={r:r,note:note};
+    document.querySelectorAll("#inspList .inrow2").forEach(function(row){
+      var n=row.getAttribute("data-n");
+      var r=((row.querySelector(".insel")||{}).value)||"";
+      var note=(((row.querySelector(".innote2")||{}).value)||"").trim();
+      if(r||note) res[n]={r:r,note:note};
     });
-    return { date:(($("in-date")||{}).value||"").trim(), inspector:(($("in-inspector")||{}).value||"").trim(), results:res };
+    var attach={}; INSPECT_ATTACH.forEach(function(a){ var c=$("att-"+a.id); attach[a.id]=!!(c&&c.checked); });
+    return {
+      date:(($("in-date")||{}).value||"").trim(),
+      runHours:(($("in-runhours")||{}).value||"").trim(),
+      inspector:(($("in-inspector")||{}).value||"").trim(),
+      opDate:(($("in-opdate")||{}).value||"").trim(),
+      repairer:(($("in-repairer")||{}).value||"").trim(),
+      safetyMgr:(($("in-safety")||{}).value||"").trim(),
+      attach:attach, maint:(($("in-maint")||{}).value||"").trim(),
+      results:res
+    };
   }
   function saveInspRecords(arr, cb){
     var obj={records:arr, at:Date.now()};
@@ -1076,30 +1132,41 @@
   }
   function inspRecordLines(rec){
     var lines=[];
+    lines.push("상호,"+csvCell(INSPECT_FIXED.상호));
+    lines.push("대표자,"+csvCell(INSPECT_FIXED.대표자));
+    lines.push("소재지,"+csvCell(INSPECT_FIXED.소재지));
+    lines.push("삭도구분,"+csvCell(INSPECT_FIXED.삭도구분));
+    lines.push("관리번호,"+csvCell(INSPECT_FIXED.관리번호)+",승차정원,"+csvCell(INSPECT_FIXED.승차정원));
+    lines.push("준공일자,"+csvCell(INSPECT_FIXED.준공일자)+",가동시간,"+csvCell(rec.runHours||""));
     lines.push("점검일자,"+csvCell(rec.date||""));
-    lines.push("점검자,"+csvCell(rec.inspector||""));
     lines.push("");
-    lines.push(["점검항목","결과","문제점 및 대책","비고"].map(csvCell).join(","));
-    INSPECT_ITEMS.forEach(function(it){
-      var c=(rec.results&&rec.results[it.n])||{};
-      var r=c.r==="○"?"양호":c.r==="×"?"불량":c.r==="—"?"해당없음":"";
-      lines.push([(it.n), r, (c.note||""), (it.s?"자체점검":"")].map(csvCell).join(","));
+    lines.push(["번호","분류","점검항목","점검결과","정비개요"].map(csvCell).join(","));
+    INSPECT_GROUPS.forEach(function(gr){
+      gr.items.forEach(function(it,j){
+        var c=(rec.results&&rec.results[it.n])||{};
+        lines.push([(j===0?gr.no:""),(gr.g||""),it.n,(c.r||""),(c.note||"")].map(csvCell).join(","));
+      });
     });
+    lines.push("");
+    lines.push("별첨서류,"+csvCell(INSPECT_ATTACH.map(function(a){ return a.label+((rec.attach&&rec.attach[a.id])?"■":"□"); }).join(" ")));
+    lines.push("정비내용,"+csvCell(rec.maint||""));
+    lines.push("점검자,"+csvCell(rec.inspector||"")+",정비완료일자,"+csvCell(rec.opDate||""));
+    lines.push("정비자,"+csvCell(rec.repairer||"")+",안전관리자,"+csvCell(rec.safetyMgr||""));
     return lines;
   }
   window.exportInspRecord=function(id){
     var rec=inspRecords.filter(function(r){return r.id===id;})[0]; if(!rec){ toast("기록을 찾을 수 없습니다"); return; }
-    var lines=["삭도시설 점검표"].concat(inspRecordLines(rec));
+    var lines=["삭도시설 정기점검기록부"].concat(inspRecordLines(rec));
     var tag=(rec.date||"").replace(/[^0-9]/g,"")||"회차";
-    saveFile("삭도시설점검표_"+tag+".csv", "﻿"+lines.join("\r\n"), "text/csv");
+    saveFile("삭도시설정기점검기록부_"+tag+".csv", "﻿"+lines.join("\r\n"), "text/csv");
   };
   window.exportInspection=function(){
     if(!inspRecords.length){ toast("저장된 점검이 없습니다"); return; }
-    var lines=["삭도시설 점검표 — 전체 회차",""];
-    lines.push(["점검일자","점검자","양호","불량","해당없음","저장일시"].map(csvCell).join(","));
+    var lines=["삭도시설 정기점검기록부 — 전체 회차",""];
+    lines.push(["점검일자","점검자","가동시간","양호","불량","조치","해당없음","저장일시"].map(csvCell).join(","));
     inspRecords.forEach(function(rec){
       var s=inspSummary(rec);
-      lines.push([rec.date||"", rec.inspector||"", s.ok, s.ng, s.na, rec.at?new Date(rec.at).toLocaleString("ko-KR"):""].map(csvCell).join(","));
+      lines.push([rec.date||"", rec.inspector||"", rec.runHours||"", s.양호, s.불량, s.조치, s.해당없음, rec.at?new Date(rec.at).toLocaleString("ko-KR"):""].map(csvCell).join(","));
     });
     lines.push(""); lines.push("");
     inspRecords.forEach(function(rec){
@@ -1107,7 +1174,7 @@
       lines=lines.concat(inspRecordLines(rec));
       lines.push("");
     });
-    saveFile("삭도시설점검표_전체.csv", "﻿"+lines.join("\r\n"), "text/csv");
+    saveFile("삭도시설정기점검기록부_전체.csv", "﻿"+lines.join("\r\n"), "text/csv");
   };
   window.qGuessQuarter=function(){
     var q=$("q-quarter"); if(!q||q.value.trim()) return;
