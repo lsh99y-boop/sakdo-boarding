@@ -1357,8 +1357,9 @@
   function renderRecords(){
     var trips=day.length, people=day.reduce(function(a,e){return a+(e.count||0);},0);
     var up=day.filter(function(e){return e.direction==="상행";}).length;
+    var runTxt='<span style="font-size:16px">'+fmtRun(trips*RUNMIN)+'</span>';
     $("summary").innerHTML=
-      stat(trips,"운행 횟수")+stat(people,"총 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행");
+      stat(trips,"운행 횟수")+stat(people,"총 탑승인원")+stat(up+"↑ "+(trips-up)+"↓","상·하행")+stat(runTxt,"운행시간 (회당 "+RUNMIN+"분)");
     var list=$("reclist");
     var multiDay=(rangeFrom!==rangeTo);
     var rangeLabel=multiDay?(fmtDate(rangeFrom)+" ~ "+fmtDate(rangeTo)):fmtDate(rangeFrom);
@@ -1383,6 +1384,8 @@
     }).join("");
   }
   function stat(n,l){return '<div class="stat"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+  var RUNMIN=25; // 상/하행 1회 운행 소요시간(분)
+  function fmtRun(m){ if(!m) return "0분"; var h=Math.floor(m/60), mm=m%60; return h?(h+"시간"+(mm?" "+mm+"분":"")):(mm+"분"); }
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
   function fmtDate(s){if(!s)return"";var p=s.split("-");return p[0]+"년 "+(+p[1])+"월 "+(+p[2])+"일";}
 
