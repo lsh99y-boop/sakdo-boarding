@@ -198,8 +198,9 @@
   .partform input:focus{outline:2px solid var(--accent);outline-offset:-1px}
   .parterr{color:var(--warn);font-size:12.5px;font-weight:600;margin-top:8px}
   /* 점검표 */
-  .subtabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:12px}
-  .subtab{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;padding:10px 6px;font-size:13px;font-weight:700;cursor:pointer}
+  .subtabs{position:sticky;top:var(--hdrh,64px);z-index:19;background:var(--bg);padding:8px 0 10px;margin-bottom:4px}
+  .subtabs-pill{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:5px}
+  .subtab{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;padding:10px 4px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;letter-spacing:-0.02em}
   .subtab.sel{background:var(--accent);color:var(--accent-ink)}
   .inrow{padding:9px 15px;border-bottom:1px solid var(--line)}
   .inrow:last-child{border-bottom:0}
@@ -447,10 +448,12 @@
 
   <!-- 점검표 -->
   <section class="panel" id="panel-inspect" hidden>
-    <div class="subtabs" role="tablist">
-      <button type="button" class="subtab sel" data-sub="facility" onclick="inspSub('facility')">삭도시설 점검표</button>
-      <button type="button" class="subtab" data-sub="quarter" onclick="inspSub('quarter')">분기점검</button>
-      <button type="button" class="subtab" data-sub="ts" onclick="inspSub('ts')">TS 정기점검</button>
+    <div class="subtabs">
+      <div class="subtabs-pill" role="tablist">
+        <button type="button" class="subtab sel" data-sub="facility" onclick="inspSub('facility')">삭도시설 점검표</button>
+        <button type="button" class="subtab" data-sub="quarter" onclick="inspSub('quarter')">분기점검</button>
+        <button type="button" class="subtab" data-sub="ts" onclick="inspSub('ts')">TS 정기점검</button>
+      </div>
     </div>
 
     <!-- ① 삭도시설 정기점검기록부 (공식 양식) -->
@@ -1662,7 +1665,10 @@
       db=null; mode="local";
     }
     reflectMode(); loadPin(); watchRange(todayStr(),todayStr()); watchPermits(); watchStatus(); watchParts(); watchInspection(); qLog.watch(); tsLog.watch();
+    setHdrH(); window.addEventListener("resize", setHdrH); window.addEventListener("orientationchange", setHdrH);
   }
+  // 서브탭 sticky 위치용: 헤더 실제 높이(안전영역 포함)를 --hdrh에 반영
+  function setHdrH(){ var h=document.querySelector("header.top"); if(h) document.documentElement.style.setProperty("--hdrh", Math.round(h.getBoundingClientRect().bottom)+"px"); }
   if(document.readyState!=="loading") start();
   else document.addEventListener("DOMContentLoaded",start);
 })();
